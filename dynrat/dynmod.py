@@ -10,6 +10,7 @@ References
 """
 
 import numpy as np
+from scipy.optimize import newton
 
 
 GRAVITY = 32.2
@@ -116,7 +117,7 @@ class QSolve:
         """Zero function.
 
         This private method is meant to be used internally during the
-        iterative solution of q. `l2`, `l3`, `l4`, `l5`, and `l6` do
+        iterative solution of `q`. `l2`, `l3`, `l4`, `l5`, and `l6` do
         not need to be computed for every iteration.
         """
 
@@ -129,7 +130,7 @@ class QSolve:
         """Derivative (with respect to q) of the zero function.
 
         This private method is meant to be used internally during the
-        iterative solution of q. `l2`, `l3`, `l4`, `l5`, and `l6` do
+        iterative solution of `q`. `l2`, `l3`, `l4`, `l5`, and `l6` do
         not need to be computed for every iteration.
         """
 
@@ -199,6 +200,45 @@ class QSolve:
 
         return -2 / 3 * (self._bed_slope * top_width) \
             / (self._slope_ratio**2 * GRAVITY * area**3)
+
+    def q_solve(self, h, h_prime, q_prime, q0=None):
+        """Iteratively solves for discharge
+
+        Paramters
+        ---------
+        h : float
+            Stage of current time step
+        h_prime : float
+            Stage of previous time step
+        q_prime : float
+            Discharge of previous time step
+        q0 : {float, None}, optional
+            Initial estimate of q (the default is, None, which uses
+            `q_prime` as an initial estimate).
+
+        """
+
+        l2 = self._L2(h)
+        l3 = self._L3(q_prime, h_prime)
+        l4 = self._L4(h, h_prime)
+        l5 = self._L5(h, h_prime)
+        l6 = self._L6(h)
+
+        # convergence tolerance
+        tol = 1.0  # cfs
+
+        if q0 is None:
+            q0 = q_prime
+
+        q = newton(
+            lambda q: self._f(
+                q, l2, l3, l4, l5, l6),
+            q0,
+            lambda q: self._f_prime(
+                q, l2, l3, l4, l5, l6),
+            tol=tol)
+
+        return q
 
     def zero_func(self, h, h_prime, q, q_prime):
         """Iterative solution zero function
