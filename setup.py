@@ -11,7 +11,7 @@ version = '0.0'
 release = '0.0.1'
 dev_status = 'Development Status :: 1 - Planning'
 
-install_requires = ['numpy']
+install_requires = ['numpy', 'scipy']
 
 setup_kwargs = {
     'name': name,

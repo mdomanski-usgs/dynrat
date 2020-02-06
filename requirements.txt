@@ -1,2 +1,5 @@
 autopep8
+notebook
+numpy
 pylint
+scipy
