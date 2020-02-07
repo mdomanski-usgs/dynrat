@@ -42,7 +42,7 @@ class Frict:
         if self._stage.size < 2:
             raise ValueError("stage must at least have two elements")
 
-        if not np.alltrue(np.diff(stage) > 0):
+        if not np.alltrue(np.diff(stage) >= 0):
             raise ValueError("stage must be sorted in ascending order")
 
         if self._roughness.ndim != 1:
@@ -145,7 +145,14 @@ class QSolve:
         top_width = self._sect.top_width(h)
         area = self._sect.area(h)
 
-        dBdh = (top_width - top_width_prime) / (h - h_prime)
+        dh = h - h_prime
+
+        # minimum dh value for computing the derivative of
+        # top with with respect to stage
+        if dh == 0:
+            dh = 0.001
+
+        dBdh = (top_width - top_width_prime) / dh
 
         return 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
 
