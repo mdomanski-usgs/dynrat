@@ -173,7 +173,8 @@ class QSolve:
 
         area_prime = self._sect.area(h_prime)
 
-        return self._bed_slope + 2 / 3 * self._bed_slope / self._slope_ratio**2 \
+        return self._bed_slope + \
+            2 / 3 * self._bed_slope / self._slope_ratio**2 \
             + q_prime / (GRAVITY * area_prime * self._time_step)
 
     def _L4(self, h, h_prime):
