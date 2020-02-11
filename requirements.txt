@@ -1,5 +1,7 @@
 autopep8
 notebook
 numpy
+pandas
+pantherapy
 pylint
 scipy
