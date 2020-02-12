@@ -5,3 +5,4 @@ pandas
 pantherapy
 pylint
 scipy
+Sphinx
