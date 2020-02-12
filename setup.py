@@ -21,11 +21,12 @@ setup_kwargs = {
     'license': 'License :: Public Domain',
     'author': 'Marian Domanski',
     'author_email': 'mdomanski@usgs.gov',
-    'description': 'Dynamic ratings',
+    'description': 'Dynamic rating',
     'classifiers': [
         dev_status,
         'Intended Audience :: Science/Research',
-        'Programming Language :: Python 3.7'
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering :: Hydrology'
     ],
     'python_requires': '~=3.7',
     'install_requires': install_requires
