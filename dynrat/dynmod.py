@@ -212,7 +212,7 @@ class QSolve:
     def q_solve(self, h, h_prime, q_prime, q0=None):
         """Iteratively solves for discharge
 
-        Paramters
+        Parameters
         ---------
         h : float
             Stage of current time step
@@ -251,7 +251,6 @@ class QSolve:
     def zero_func(self, h, h_prime, q, q_prime):
         """Iterative solution zero function
 
-        Computes the zero function (eq. 15 of [1]_).
 
         Parameters
         ----------
@@ -263,6 +262,11 @@ class QSolve:
             Discharge of current time step
         q_prime : float
             Discharge of previous time step
+
+        Notes
+        -----
+
+        Computes the zero function (eq. 15 of [1]_).
 
         """
 
