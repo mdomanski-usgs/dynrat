@@ -150,9 +150,9 @@ class QSolve:
         # minimum dh value for computing the derivative of
         # top with with respect to stage
         if dh == 0:
-            dh = 0.001
-
-        dBdh = (top_width - top_width_prime) / dh
+            dBdh = 0
+        else:
+            dBdh = (top_width - top_width_prime) / dh
 
         return 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
 
