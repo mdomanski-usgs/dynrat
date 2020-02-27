@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'dynrat'
-copyright = '2020, USGS'
+# copyright = '2020, USGS'
 author = 'USGS'
 
 # The full version, including alpha/beta/rc tags
@@ -52,3 +52,5 @@ html_theme = 'sphinxdoc'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_show_copyright = False

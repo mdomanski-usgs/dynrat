@@ -1,7 +1,9 @@
-dynrat
-======
+dynrat package
+==============
 
 .. toctree::
    :maxdepth: 4
 
    dynrat
+   frict
+   sect

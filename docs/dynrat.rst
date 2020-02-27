@@ -1,8 +1,5 @@
-dynrat package
-==============
-
-Submodules
-----------
+dynmod
+======
 
 dynrat.dynmod module
 --------------------
