@@ -4,5 +4,7 @@ numpy
 pandas
 pantherapy
 pylint
+recommonmark
+rstcheck
 scipy
 Sphinx

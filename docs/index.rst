@@ -10,6 +10,7 @@ Welcome to dynrat's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   CONTRIBUTING
    tutorial/index
    modules
 
