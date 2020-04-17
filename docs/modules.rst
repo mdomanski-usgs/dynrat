@@ -6,4 +6,5 @@ dynrat package
 
    dynrat
    frict
+   rslope
    sect
