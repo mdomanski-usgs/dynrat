@@ -1,4 +1,4 @@
-"""computation of the ratio of flood wave slope to bed slope
+"""Computation of the ratio of channel bed slope to an average wave slope
 
 References
 ----------
@@ -13,30 +13,45 @@ import numpy as np
 import pantherapy.panthera as sect
 
 
-def r_slope(h_o, h_p, Q_o, Q_p, S_o, sect, t_diff):  
+def r_slope(h_o, h_p, q_o, q_p, s_o, sect, t_diff):
+    """Computes the ratio of channel bed slope to an average wave slope
 
-   """r=So/Sw
+    The ratio is computed according to eq. 13 of [1]_.
 
-   Parameters
-   ----------
-   h_o : float
-   h_p : float
-   Q_o : float
-   Q_p : float
-   S_o : float
-   sect : CrossSection
-   t_diff : float
-   
-   """
-   
-   a_o = sect.area(h_o)
-   a_p = sect.area(h_p)
-   a_mean = (a_o + a_p)/2
-   
-   h_diff = h_p-h_o
-   q_sum = Q_p+Q_o
-   r1 = (56200*q_sum)/(h_diff*a_mean)
-   r2  = r1*t_diff*S_o
-   return r2
+    .. math:: r = \\frac{S_o}{S_w}
 
+    Parameters
+    ----------
+    h_o: float
+        Stage at beginning of typical flood, in ft
+    h_p: float
+        Peak stage of typical flood, in ft
+    q_o: float
+        Discharge at beginning of typical flood, in cfs
+    q_p: float
+        Peak discharge for typical flood, in cfs
+    s_o: float
+        Bed slope
+    sect: Sect
+        Channel cross section
+    t_diff: float
+        Interval of time from beginning of rise in stage until the occurrence
+        of peak stage, in days
 
+    Returns
+    -------
+    float
+        Ratio of channel bed slope to an average wave slope
+
+    """
+
+    h_mean = (h_o + h_p)/2
+
+    a_mean = sect.area(h_mean)
+
+    h_diff = h_p-h_o
+    q_sum = q_p+q_o
+    r1 = (56200*q_sum)/(h_diff*a_mean)
+    r2 = r1*t_diff*s_o
+
+    return r2
