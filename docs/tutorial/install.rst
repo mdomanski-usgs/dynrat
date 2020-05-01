@@ -2,12 +2,14 @@
 Installing required programs
 ============================
 
-Python
-======
+.. _installing-python:
+
+Installing Python
+=================
 This assumes you'll be installing a new Python 3.7 environment as the primary
 Python environment on your machine. Following these steps may cause you trouble
 if other applications on your machine depend on a particular system-wide
-version of Python. There are other options, but they require
+version of Python. There are other options, but are not covered here.
 
 Download Python
 ---------------
@@ -20,7 +22,7 @@ Run the installer. You may install Python using the "Just me" option if you
 don't have admin rights on your machine. Be sure to mark the option to include
 this installed version on PATH.
 
-Test the Python Install
+Test the Python install
 -----------------------
 To be sure you have Python 3.7 up and running, open up a Command Prompt and
 type in the following line. After installing the environment in this section of
@@ -31,8 +33,12 @@ the tutorial, you should get similar output as shown below.
     >python --version
     Python 3.7.7
 
-Visual Studio Code
-==================
+Return to :ref:`check-your-installation`.
+
+.. _installing-vscode:
+
+Installing Visual Studio Code
+=============================
 Visual Studio Code (VSCode), not to be confused with Visual Studio, is a
 lightweight, open source IDE developed and released by Microsoft. If you're
 comfortable with and prefer other IDEs, you may skip this section.
@@ -47,7 +53,7 @@ Install VSCode
 Run the VSCode installer. Install it for user profile only. Do not install it
 for all users.
 
-Test the VSCode Install
+Test the VSCode install
 -----------------------
 From a command prompt, type in the following line. After installing VSCode, you
 should get similar output as shown below.
@@ -62,8 +68,12 @@ should get similar output as shown below.
 To run VSCode, either type `code` in the command line or start Visual Studio
 Code from the start menu.
 
-Git
-===
+Return to :ref:`check-your-installation`.
+
+.. _installing-git:
+
+Installing Git
+==============
 Git is a key component to a source, or version, control management system. Git
 allows you to make copies of, or clone, remote repositories hosted on sites
 like GitHub, GitLab, and code.usgs.gov. Git must be installed and accessible on
@@ -78,7 +88,7 @@ Install Git
 Run the installer. If possible, do not install Git for all users. While
 installing, select VSCode as your editor.
 
-Test the Git Install
+Test the Git install
 --------------------
 To test the Git install, run the following in the command line. If the install
 worked, you will see the version number as the output.
@@ -88,6 +98,7 @@ worked, you will see the version number as the output.
     >git --version
     git version 2.21.0.windows.1
 
+Return to :ref:`check-your-installation`.
 
 .. links
 .. _Python downloads: https://www.python.org/downloads/
