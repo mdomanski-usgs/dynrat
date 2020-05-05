@@ -49,10 +49,24 @@ command prompt.
 This will display the version of Git installed on your system. If the command
 fails, see :ref:`installing-git`.
 
-All commands are for Bash (or Git Bash)
+.. _setup-clone-the-repo:
 
 Clone the repository
 ====================
+You must be connected to the DOI network to access projects on code.usgs.gov
+through SSH.
+
+First, make sure you can access repositories on code.usgs.gov through the SSH
+protocol. To test your access, open Git Bash and type the following command.
+
+.. code-block:: console
+
+    $ ssh -T git@code.usgs.gov
+
+If the above command prints a DOI warning banner, then `Welcome to GitLab` and
+your user name, then you have SSH access on your system. If the command fails,
+then see :ref:`setting-up-gitlab-ssh`.
+
 .. code-block:: console
 
     $ git clone git@code.usgs.gov:dynamic-rating/dynrat.git

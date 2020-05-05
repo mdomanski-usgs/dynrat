@@ -4,4 +4,5 @@ Tutorials
 .. toctree::
 
    setup
-   install.rst
+   install
+   ssh
