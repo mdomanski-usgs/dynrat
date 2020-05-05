@@ -51,11 +51,13 @@ fails, see :ref:`installing-git`.
 
 .. _setup-clone-the-repo:
 
-Clone the repository
-====================
+Clone dynrat
+============
 You must be connected to the DOI network to access projects on code.usgs.gov
 through SSH.
 
+Check your SSH access
+---------------------
 First, make sure you can access repositories on code.usgs.gov through the SSH
 protocol. To test your access, open Git Bash and type the following command.
 
@@ -67,26 +69,35 @@ If the above command prints a DOI warning banner, then `Welcome to GitLab` and
 your user name, then you have SSH access on your system. If the command fails,
 then see :ref:`setting-up-gitlab-ssh`.
 
+Clone the repository
+--------------------
+In Git Bash, navigate to the directory where you want to store the repository.
+When you clone a repository, an new directory with the name of the project
+will be created, and the directory will contain the repository. To clone the
+dynrat repository, type the following command.
+
 .. code-block:: console
 
     $ git clone git@code.usgs.gov:dynamic-rating/dynrat.git
 
 Change directories
-==================
+------------------
+Before you continue, change directories into the dynrat directory by typing the
+following command.
+
 .. code-block:: console
 
     $ cd dynrat
 
-Create a virtual environment
+Set up a virtual environment
 ============================
-dynrat has only been tested with Python version 3.7. To make sure you're
-creating an environment with the correct version, use the following command.
+In creating a virtual environment, you will create an isolated installation of
+Python and install the supporting packages with the correct versions. The
+environment will be created within the dynrat directory and it will stand apart
+from other Python environments on your machine.
 
-.. code-block:: console
-
-    $ python --version
-    Python 3.7.7
-
+Create a virtual environment
+----------------------------
 Create an environment using the venv module.
 
 .. code-block:: console
@@ -98,23 +109,47 @@ tutorial/venv.html>`_ and `venv documentation <https://docs.python.org/3.7/
 library/venv.html>`_ for more information.
 
 Activate the virtual environment
-================================
+--------------------------------
 Use the `activate` command to activate the virtual environment. The name of the
-environment will appear in parentheses in the shell prompt.
+environment will appear in parentheses in the shell prompt. To activate the
+environment in the Git Bash terminal, type the following command.
 
 .. code-block:: console
 
     $ . env/Scripts/activate
     (env) $
 
+To activate the virtual environment in the Windows command prompt (outside of
+this tutorial, for instance), type the following command
+
+.. code-block:: winbatch
+
+    >env\Scripts\activate
+
+After setting up the virtual environment, you must activate it when you work
+with the dynrat package in the future.
+
+.. _install-required-packages:
+
 Install the required packages
-=============================
+-----------------------------
+In the dynrat repository, there is a file named `requirements.txt` that
+contains a list of Python packages that are required by dynrat. The
+requirements file is used with pip (the standard Python package management
+system) to install the required packages in the new environment.
+
+Type the following command to install the required packages in the new
+environment.
+
 .. code-block:: console
 
     (env) $ pip install -r requirements.txt
 
+If you get an ``SSLError`` when trying to install the requirements, see
+:ref:`doi-ssl-intercept` and try again.
+
 Install the IPython kernel
-==========================
+--------------------------
 .. code-block:: console
 
     (env) $ python -m ipykernel install --user --name dynratenv --display-name "Python (dynrat)"
@@ -124,8 +159,7 @@ See more at
 install/kernel_install.html#kernels-for-different-environments>`_
 
 Install the dynrat package
-==========================
-
+--------------------------
 In order for the Python interpreter in the dynrat environment to have "global"
 access to the dynrat package, you'll have to install the package within the
 dynrat environment.
@@ -140,8 +174,7 @@ See `Editable installs <https://pip.pypa.io/en/stable/reference/pip_install/
 
 
 Build the documentation (optional)
-==================================
-
+----------------------------------
 .. code-block:: console
 
     (env) $ python setup.py build_sphinx
