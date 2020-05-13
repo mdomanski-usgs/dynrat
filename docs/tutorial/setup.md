@@ -150,8 +150,7 @@ The `-e` option tells pip to install the dynrat package in "editable" mode.
 See [Editable installs](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs) for more info.
 
 
-Build the documentation (optional)
-----------------------------------
+### Build the documentation (optional)
 ```
 (env) $ python setup.py build_sphinx
 ```
