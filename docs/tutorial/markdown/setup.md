@@ -56,7 +56,7 @@ $ ssh -T git@code.usgs.gov
 
 If the above command prints a DOI warning banner, then `Welcome to GitLab` and
 your user name, then you have SSH access on your system. If the command fails,
-then see [Setting up GitLab SSH](ssh).
+then see [Setting up GitLab SSH](ssh.md).
 
 ### Clone the repository
 In Git Bash, navigate to the directory where you want to store the repository.
