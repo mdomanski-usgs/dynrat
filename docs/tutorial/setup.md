@@ -11,7 +11,7 @@ and type the following command.
 ```
 
 The output of the command will show the Python version. If the command fails,
-or the version shown isn't 3.7, see [Installing python](install#installing-python).
+or the version shown isn't 3.7, see [Installing python](install.md#installing-python).
 
 ### Check for an IDE
 If you are going to be editing code, it is recommended that you use an IDE. If
@@ -28,7 +28,7 @@ program.
 ```
 
 If you're unable to locate VSCode on your system, see
-[Installing Visual Studio Code](install#installing-visual-studio-code).
+[Installing Visual Studio Code](install.md#installing-visual-studio-code).
 
 ### Check for a Git installation
 You must have Git installed in order to clone the remote dynrat repository. To
@@ -40,7 +40,7 @@ command prompt.
 ```
 
 This will display the version of Git installed on your system. If the command
-fails, see [Installing Git](install#installing-git).
+fails, see [Installing Git](install.md#installing-git).
 
 ## Clone dynrat
 You must be connected to the DOI network to access projects on code.usgs.gov
