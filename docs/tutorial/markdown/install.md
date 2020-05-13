@@ -4,7 +4,7 @@
 This assumes you'll be installing a new Python 3.7 environment as the primary
 Python environment on your machine. Following these steps may cause you trouble
 if other applications on your machine depend on a particular system-wide
-version of Python. There are other options, but are not covered here.
+version of Python. There are other options, but they are not covered here.
 
 ### Download Python
 Go to the [Python downloads page][1] and download the installer for the latest
