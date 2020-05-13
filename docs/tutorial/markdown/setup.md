@@ -127,7 +127,7 @@ environment.
 ```
 
 If you get an `SSLError` when trying to install the requirements, see
-[DOI SSL Intercept](pip-ssl) and try again.
+[DOI SSL Intercept](pip-ssl.md) and try again.
 
 ### Install the IPython kernel
 ```
