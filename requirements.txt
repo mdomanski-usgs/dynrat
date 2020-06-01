@@ -2,7 +2,6 @@ autopep8
 notebook
 numpy
 pandas
-pantherapy
 pylint
 recommonmark
 rstcheck

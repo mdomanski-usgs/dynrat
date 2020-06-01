@@ -10,7 +10,6 @@ References
 """
 
 import numpy as np
-import pantherapy.panthera as sect
 
 
 def r_slope(h_o, h_p, q_o, q_p, s_o, sect, t_diff):

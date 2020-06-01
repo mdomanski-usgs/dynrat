@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from pantherapy.panthera import CrossSection
+from anchovy.crosssection import CrossSection
 
 import dynrat
 from dynrat.rslope import r_slope
@@ -20,10 +20,11 @@ class TestRSlope(TestCase):
         xs_data_path = os.path.join(examples_dir, 'data', 'stlms', 'xs.csv')
 
         roughness = 0.035
-        z, y = np.loadtxt(xs_data_path, delimiter=',', skiprows=1, unpack=True)
+        station, elevation = np.loadtxt(
+            xs_data_path, delimiter=',', skiprows=1, unpack=True)
         datum = 379.58
-        y = y - datum
-        sect = CrossSection(y, z, roughness)
+        elevation = elevation - datum
+        sect = CrossSection(station, elevation, roughness)
 
         h_o = 4.68  # stage prior to start of typical flood
         h_p = 24.18  # peak stage of typical flood
