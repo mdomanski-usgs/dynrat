@@ -13,6 +13,7 @@ Welcome to dynrat's documentation!
    CONTRIBUTING
    tutorial/index
    method
+   newmethod
    modules
 
 
