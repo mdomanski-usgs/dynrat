@@ -30,7 +30,8 @@ release = '0.0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['recommonmark', 'sphinx.ext.autodoc', 'sphinx.ext.napoleon']
+extensions = ['recommonmark', 'sphinx.ext.autodoc',
+              'sphinx.ext.napoleon', 'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -55,3 +56,7 @@ html_theme = 'sphinxdoc'
 html_static_path = ['_static']
 
 html_show_copyright = False
+
+intersphinx_mapping = {'numpy':
+                       ('https://numpy.org/doc/stable/', None),
+                       'matplotlib': ('https://matplotlib.org/', None)}
