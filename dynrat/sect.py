@@ -1,6 +1,9 @@
 from abc import abstractmethod
 
+import matplotlib.pyplot as plt
 import numpy as np
+
+from dynrat.frict import TableFrict
 
 
 class Sect:
@@ -106,3 +109,108 @@ class TableSect(Sect):
         """
 
         return np.interp(stage, self._stage, self._top_width)
+
+
+class CrossSect(Sect):
+    """Cross section
+
+    Parameters
+    ----------
+    xs : anchovy.crosssection.CrossSection
+        Instance of a cross section from the anchovy package
+
+    """
+
+    def __init__(self, xs):
+
+        self._xs = xs
+
+        self._station, self._elevation = xs.coordinates()
+
+        self._e_min = self._elevation.min()
+        self._e_max = self._elevation.max()
+
+        e = np.linspace(self._e_min, self._e_max)
+
+        area = xs.area(e)
+        top_width = xs.top_width(e)
+        roughness = xs.roughness(e)
+
+        self._sect = TableSect(e, area, top_width)
+        self._frict = TableFrict(e, roughness)
+
+    def area(self, stage):
+        """Computes area of this cross section
+
+        Parameters
+        ----------
+        stage : float
+
+        Returns
+        -------
+        float
+
+        """
+
+        if stage < self._e_min or self._e_max < stage:
+            raise ValueError(
+                "Stage is outside of the range of this cross section")
+
+        return self._sect.area(stage)
+
+    def plot(self, ax=None):
+        """Plots the coordinates of this cross section
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+
+        """
+
+        ax = self._xs.plot(ax=ax)
+
+        ax.set_ylabel('Stage, in feet')
+
+        return ax
+
+    def roughness(self, stage):
+        """Computes the roughness of this cross section at a given stage
+
+        Parameters
+        ----------
+        stage : float
+
+        Returns
+        -------
+        float
+
+        """
+
+        if stage < self._e_min or self._e_max < stage:
+            raise ValueError(
+                "Stage is outside of the range of this cross section")
+
+        return self._frict.roughness(stage)
+
+    def top_width(self, stage):
+        """Computes the top width for this cross section at a given stage
+
+        Parameters
+        ----------
+        stage : float
+
+        Returns
+        -------
+        float
+
+        """
+
+        if stage < self._e_min or self._e_max < stage:
+            raise ValueError(
+                "Stage is outside of the range of this cross section")
+
+        return self._sect.top_width(stage)
