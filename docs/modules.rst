@@ -8,3 +8,4 @@ dynrat package
    frict
    rslope
    sect
+   timeseries

@@ -59,4 +59,7 @@ html_show_copyright = False
 
 intersphinx_mapping = {'numpy':
                        ('https://numpy.org/doc/stable/', None),
-                       'matplotlib': ('https://matplotlib.org/', None)}
+                       'matplotlib': ('https://matplotlib.org/', None),
+                       'pandas':
+                       ('https://pandas.pydata.org/pandas-docs/stable/',
+                        None)}
