@@ -6,6 +6,7 @@ dynrat package
 
    dynrat
    frict
+   plot
    rslope
    sect
    timeseries
