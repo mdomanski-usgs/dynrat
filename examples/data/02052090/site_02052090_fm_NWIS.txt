@@ -1,0 +1,21 @@
+#
+# U.S. Geological Survey, National Water Information System
+# Surface water measurements
+#
+# Retrieved: 2020-08-12 12:37:15 EDT     (sdww01)
+#
+# Further descriptions of the columns and codes used can be found at:
+# https://help.waterdata.usgs.gov/output-formats#streamflow_measurement_data
+#
+# Data for the following 1 site(s) are contained in this file
+#  USGS 02052090 MEHERRIN RIVER NEAR BRYANTS CORNER, VA
+# -----------------------------------------------------------------------------------
+#
+#
+agency_cd	site_no	measurement_nu	measurement_dt	tz_cd	q_meas_used_fg	party_nm	site_visit_coll_agency_cd	gage_height_va	discharge_va	measured_rating_diff	gage_va_change	gage_va_time	control_type_cd	discharge_cd
+5s	15s	6s	19d	12s	1s	12s	5s	12s	12s	12s	7s	6s	21s	15s
+USGS	02052090	53	2018-05-02 10:43:47	EDT	Yes	AMC, NEB	USGS	7.83	790	Good	-0.03	0.25	DebrisLight	NONE
+USGS	02052090	54	2018-05-22 13:51:35	EDT	Yes	AMC/NEB	USGS	16.95	10100	Fair	0.00	0.25	Clear	NONE
+USGS	02052090	55	2018-05-22 14:06:41	EDT	Yes	AMC/NEB	USGS	16.94	9580	Good	-0.01	0.25	Clear	NONE
+USGS	02052090	56	2018-05-23 10:39:44	EDT	Yes	AMC/NEB	USGS	16.67	8400	Fair	0.00	0.25	Clear	NONE
+USGS	02052090	57	2018-05-24 09:59:39	EDT	Yes	AMC/JAT	USGS	15.62	4530	Good	0.01	0.20		NONE
