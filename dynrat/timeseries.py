@@ -75,58 +75,6 @@ class TimeSeries:
 
 class ObservedDischargeTimeSeries(TimeSeries):
 
-    @classmethod
-    def from_nwis_rdb(cls, rdb_path):
-
-        time_zones = {'EST': 'EST5EDT',
-                      'EDT': 'EST5EDT',
-                      'CST': 'CST6CDT',
-                      'CDT': 'CST6CDT',
-                      'MST': 'MST7MDT',
-                      'MDT': 'MST7MDT',
-                      'PST': 'PST7PDT',
-                      'PDT': 'PST7PDT'}
-
-        with open(rdb_path) as f:
-            lines = f.readlines()
-
-        i = 0
-        while lines[i][0] == '#':
-            i += 1
-
-        header_line = i
-        header = lines[i].strip().split('\t')
-
-        dt_column = header.index('measurement_dt')  # date and time
-        tz_column = header.index('tz_cd')  # time zone
-        q_column = header.index('discharge_va')  # discharge
-
-        dt_data = []
-        q_data = []
-
-        for line in lines[header_line+2:]:
-
-            line_data = line.strip().split('\t')
-
-            try:
-                datetime = pd.to_datetime(line_data[dt_column])
-                discharge = float(line_data[q_column])
-            except IndexError:
-                continue
-
-            tz = line_data[tz_column]
-            datetime = datetime.tz_localize(time_zones[tz])
-            datetime = datetime.tz_convert('UTC')
-
-            q_data.append(discharge)
-            dt_data.append(datetime)
-
-        index = pd.DatetimeIndex(dt_data)
-
-        data = pd.Series(data=q_data, index=index)
-
-        return cls(data)
-
     def plot(self, ax=None):
 
         ax = time_series_axes(ax)
@@ -135,6 +83,21 @@ class ObservedDischargeTimeSeries(TimeSeries):
 
         ax.scatter(datetime, self._data.values,
                    label='Observed Discrete Discharge', color='darkorchid')
+        ax.legend()
+
+        return ax
+
+
+class ObservedStageTimeSeries(TimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.scatter(datetime, self._data.values,
+                   label='Observed Discrete Stage', color='darkorchid')
         ax.legend()
 
         return ax
@@ -235,7 +198,7 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
         ax.plot(datetime, self._data.values,
-                label='Rated Discharge', linestyle='solid',
+                label='WSC Computed Discharge', linestyle='solid',
                 color='darkslategray')
         ax.set_xlabel('Time')
         ax.set_ylabel('Discharge, in cfs')
@@ -261,6 +224,96 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
         ax.legend()
 
         return ax
+
+
+class ComputedDischargeTimeSeries(ContinuousTimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.plot(datetime, self._data.values, label='DYNRAT Computed Discharge',
+                linestyle='solid', color='dodgerblue')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Discharge, in csf')
+
+        ax.legend()
+
+        return ax
+
+
+def read_nwis_rdb(rdb_path):
+    """Reads an NWIS RDB file containing field measurement
+    data
+
+    Parameters
+    ----------
+    rdb_path : str
+        Path to RDB file
+
+    Returns
+    -------
+    pandas.Series, pandas.Series
+        Stage, discharge time series
+
+    """
+
+    time_zones = {'EST': 'EST5EDT',
+                  'EDT': 'EST5EDT',
+                  'CST': 'CST6CDT',
+                  'CDT': 'CST6CDT',
+                  'MST': 'MST7MDT',
+                  'MDT': 'MST7MDT',
+                  'PST': 'PST7PDT',
+                  'PDT': 'PST7PDT'}
+
+    with open(rdb_path) as f:
+        lines = f.readlines()
+
+    i = 0
+    while lines[i][0] == '#':
+        i += 1
+
+    header_line = i
+    header = lines[i].strip().split('\t')
+
+    dt_column = header.index('measurement_dt')  # date and time
+    tz_column = header.index('tz_cd')  # time zone
+    h_column = header.index('gage_height_va')  # stage
+    q_column = header.index('discharge_va')  # discharge
+
+    dt_data = []
+    h_data = []
+    q_data = []
+
+    for line in lines[header_line+2:]:
+
+        line_data = line.strip().split('\t')
+
+        try:
+            datetime = pd.to_datetime(line_data[dt_column])
+            stage = float(line_data[h_column])
+            discharge = float(line_data[q_column])
+        except IndexError:
+            continue
+
+        tz = line_data[tz_column]
+        datetime = datetime.tz_localize(time_zones[tz])
+        datetime = datetime.tz_convert('UTC')
+
+        h_data.append(stage)
+        q_data.append(discharge)
+        dt_data.append(datetime)
+
+    index = pd.DatetimeIndex(dt_data)
+
+    stage_series = ObservedStageTimeSeries(pd.Series(index=index, data=h_data))
+    discharge_series = ObservedDischargeTimeSeries(
+        pd.Series(index=index, data=q_data))
+
+    return stage_series, discharge_series
 
 
 class QTimeSeries:
