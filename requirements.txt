@@ -4,6 +4,7 @@ numpy
 pandas
 pylint
 recommonmark
+rope
 rstcheck
 scipy
 Sphinx
