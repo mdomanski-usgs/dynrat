@@ -1,15 +1,6 @@
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-
-def time_series_axes(ax=None):
-
-    if ax is None:
-        ax = plt.axes()
-
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-
-    return ax
+from dynrat.timeseries import ContinuousTimeSeries, TimeSeries
 
 
 def stage_discharge_plot(stage, discharge, ax=None):
@@ -17,4 +8,24 @@ def stage_discharge_plot(stage, discharge, ax=None):
     if ax is None:
         ax = plt.axes()
 
-    ax.plot()
+    if isinstance(stage, ContinuousTimeSeries) and \
+            isinstance(discharge, ContinuousTimeSeries):
+
+        ax.plot(discharge.values(), stage.values(),
+                label='WSC Computed Discharge', linestyle='solid',
+                color='darkslategray')
+
+    elif isinstance(stage, TimeSeries) and isinstance(discharge, TimeSeries):
+
+        ax.scatter(discharge.values(), stage.values(),
+                   label='Observed Discrete Discharge', color='darkorchid')
+
+    else:
+        raise TypeError("Unrecognized types of time series")
+
+    ax.set_xlabel('Discharge, in cfs')
+    ax.set_ylabel('Stage, in ft')
+
+    ax.legend()
+
+    return ax

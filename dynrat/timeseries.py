@@ -1,8 +1,7 @@
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-from dynrat.plot import time_series_axes
 
 
 class TimeSeries:
@@ -27,6 +26,16 @@ class TimeSeries:
         ts.index.name = 'DateTime'
 
         return ts
+
+    @staticmethod
+    def _time_series_axes(ax=None):
+
+        if ax is None:
+            ax = plt.axes()
+
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+
+        return ax
 
     def data(self):
         """Returns a copy of the data contained in this
@@ -77,7 +86,7 @@ class ObservedDischargeTimeSeries(TimeSeries):
 
     def plot(self, ax=None):
 
-        ax = time_series_axes(ax)
+        ax = self._time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
@@ -92,7 +101,7 @@ class ObservedStageTimeSeries(TimeSeries):
 
     def plot(self, ax=None):
 
-        ax = time_series_axes(ax)
+        ax = self._time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
@@ -193,7 +202,7 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
 
     def plot(self, ax=None):
 
-        ax = time_series_axes(ax)
+        ax = self._time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
@@ -212,7 +221,7 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
 
     def plot(self, ax=None):
 
-        ax = time_series_axes(ax)
+        ax = self._time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
@@ -230,7 +239,7 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
     def plot(self, ax=None):
 
-        ax = time_series_axes(ax)
+        ax = self._time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
