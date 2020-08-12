@@ -1,5 +1,8 @@
+import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
+
+from dynrat.plot import time_series_axes
 
 
 class TimeSeries:
@@ -14,6 +17,16 @@ class TimeSeries:
     def __init__(self, data):
 
         self._data = data.copy(deep=True)
+
+    @staticmethod
+    def _read_aq_csv(csv_path):
+
+        df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
+
+        ts = df['Value']
+        ts.index.name = 'DateTime'
+
+        return ts
 
     def data(self):
         """Returns a copy of the data contained in this
@@ -43,10 +56,7 @@ class TimeSeries:
 
         """
 
-        df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
-
-        ts = df['Value']
-        ts.index.name = 'DateTime'
+        ts = cls._read_aq_csv(csv_path)
 
         return cls(ts)
 
@@ -63,7 +73,50 @@ class TimeSeries:
         return self._data.values
 
 
+class ObservedDischargeTimeSeries(TimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.scatter(datetime, self._data.values, color='darkorchid')
+
+        return ax
+
+
 class ContinuousTimeSeries(TimeSeries):
+
+    def __init__(self, data, freq=None):
+
+        if freq is None and data.index.freq is None:
+            raise ValueError(
+                "Continuous time series frequency must be specified")
+
+        if freq is not None and data.index.freq is None and \
+                data.index.freq != pd.tseries.offsets.DateOffset(seconds=freq):
+            data = self._set_freq(data, freq, True)
+        else:
+            data = data.copy()
+
+        super().__init__(data)
+
+    @staticmethod
+    def _set_freq(data, freq, interp_missing=False):
+
+        freq = '{}S'.format(freq)
+        index = pd.date_range(
+            start=data.index[0], end=data.index[-1], freq=freq,
+            tz=data.index.tz)
+        index.name = 'DateTime'
+
+        new_data = data[index]
+
+        if interp_missing:
+            new_data = new_data.interpolate()
+
+        return new_data
 
     def change_freq(self, freq, interp_missing=False):
         """Change the frequency of this time series
@@ -82,18 +135,60 @@ class ContinuousTimeSeries(TimeSeries):
 
         """
 
-        freq = pd.tseries.offsets.DateOffset(seconds=freq)
-        index = pd.date_range(
-            start=self._data.index[0], end=self._data.index[-1], freq=freq,
-            tz=self._data.index.tz)
-        index.name = 'DateTime'
-
-        data = self._data[index]
-
-        if interp_missing:
-            data = data.interpolate()
+        data = self._set_freq(self._data, freq, interp_missing)
 
         return self.__class__(data)
+
+    def freq(self):
+        """Returns the frequency of the observations of
+        this data set
+
+        Returns
+        -------
+        float
+
+        """
+        return self._data.index.freq.nanos/1e9
+
+    @classmethod
+    def from_aq_csv(cls, csv_path, freq=None):
+        """Read time series from Aquarius CSV file
+
+        Parameters
+        ----------
+        csv_path : str
+            Path to Aquarius CSV file
+        freq : float, optional
+
+
+        """
+
+        ts = cls._read_aq_csv(csv_path)
+
+        if freq is None:
+            index_diff = ts.index[1] - ts.index[0]
+            freq = float(index_diff/np.timedelta64(1, 's'))
+
+        return cls(ts, freq)
+
+
+class RatedDischargeTimeSeries(ContinuousTimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.plot(datetime, self._data.values,
+                label='Rated Discharge', linestyle='solid',
+                color='darkslategray')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Discharge, in cfs')
+
+        ax.legend()
+
+        return ax
 
 
 class QTimeSeries:
