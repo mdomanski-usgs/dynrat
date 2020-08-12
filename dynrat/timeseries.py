@@ -75,13 +75,67 @@ class TimeSeries:
 
 class ObservedDischargeTimeSeries(TimeSeries):
 
+    @classmethod
+    def from_nwis_rdb(cls, rdb_path):
+
+        time_zones = {'EST': 'EST5EDT',
+                      'EDT': 'EST5EDT',
+                      'CST': 'CST6CDT',
+                      'CDT': 'CST6CDT',
+                      'MST': 'MST7MDT',
+                      'MDT': 'MST7MDT',
+                      'PST': 'PST7PDT',
+                      'PDT': 'PST7PDT'}
+
+        with open(rdb_path) as f:
+            lines = f.readlines()
+
+        i = 0
+        while lines[i][0] == '#':
+            i += 1
+
+        header_line = i
+        header = lines[i].strip().split('\t')
+
+        dt_column = header.index('measurement_dt')  # date and time
+        tz_column = header.index('tz_cd')  # time zone
+        q_column = header.index('discharge_va')  # discharge
+
+        dt_data = []
+        q_data = []
+
+        for line in lines[header_line+2:]:
+
+            line_data = line.strip().split('\t')
+
+            try:
+                datetime = pd.to_datetime(line_data[dt_column])
+                discharge = float(line_data[q_column])
+            except IndexError:
+                continue
+
+            tz = line_data[tz_column]
+            datetime = datetime.tz_localize(time_zones[tz])
+            datetime = datetime.tz_convert('UTC')
+
+            q_data.append(discharge)
+            dt_data.append(datetime)
+
+        index = pd.DatetimeIndex(dt_data)
+
+        data = pd.Series(data=q_data, index=index)
+
+        return cls(data)
+
     def plot(self, ax=None):
 
         ax = time_series_axes(ax)
 
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
-        ax.scatter(datetime, self._data.values, color='darkorchid')
+        ax.scatter(datetime, self._data.values,
+                   label='Observed Discrete Discharge', color='darkorchid')
+        ax.legend()
 
         return ax
 
