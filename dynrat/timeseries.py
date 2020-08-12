@@ -245,6 +245,24 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
         return ax
 
 
+class MeasuredStageTimeSeries(ContinuousTimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.plot(datetime, self._data.values, label='Measured Stage',
+                linestyle='solid', color='darkslategray')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Stage, in ft')
+
+        ax.legend()
+
+        return ax
+
+
 class QTimeSeries:
 
     def __init__(self, solver):
