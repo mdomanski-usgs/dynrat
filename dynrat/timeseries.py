@@ -88,6 +88,19 @@ class TimeSeries:
 
         return cls(ts)
 
+    def null_obs(self):
+        """Returns the number of null observations in this
+        time series
+
+        Returns
+        -------
+        int
+            Number of null observations
+
+        """
+
+        return self._data.isna().sum()
+
     def values(self):
         """Returns an array of observed values in this time
         series
@@ -132,8 +145,23 @@ class ObservedStageTimeSeries(TimeSeries):
 
 
 class ContinuousTimeSeries(TimeSeries):
+    """Time series of continuously observed parameter
 
-    def __init__(self, data, freq=None):
+    Parameters
+    ----------
+    data : pandas.Series
+        Time series data
+    freq : float or None, optional
+        Observation frequency. The default is None. If
+        None, the frequency must be specified in the series
+        DatetimeIndex.
+    interp_missing : boolean, optional
+        Interpolatel missing observations. The default is
+        False.
+
+    """
+
+    def __init__(self, data, freq=None, interp_missing=False):
 
         if freq is None and data.index.freq is None:
             raise ValueError(
@@ -141,7 +169,7 @@ class ContinuousTimeSeries(TimeSeries):
 
         if freq is not None and data.index.freq is None and \
                 data.index.freq != pd.tseries.offsets.DateOffset(seconds=freq):
-            data = self._set_freq(data, freq, True)
+            data = self._set_freq(data, freq, interp_missing)
         else:
             data = data.copy()
 
@@ -196,7 +224,7 @@ class ContinuousTimeSeries(TimeSeries):
         return self._data.index.freq.nanos/1e9
 
     @classmethod
-    def from_aq_csv(cls, csv_path, freq=None):
+    def from_aq_csv(cls, csv_path, freq=None, interp_missing=False):
         """Read time series from Aquarius CSV file
 
         Parameters
@@ -204,7 +232,13 @@ class ContinuousTimeSeries(TimeSeries):
         csv_path : str
             Path to Aquarius CSV file
         freq : float, optional
+            Observation frequency, in seconds
+        interp_missing : boolean
+            Interpolate missing observations
 
+        Returns
+        -------
+        ContinuousTimeSeries
 
         """
 
@@ -214,7 +248,7 @@ class ContinuousTimeSeries(TimeSeries):
             index_diff = ts.index[1] - ts.index[0]
             freq = float(index_diff/np.timedelta64(1, 's'))
 
-        return cls(ts, freq)
+        return cls(ts, freq, interp_missing)
 
 
 class RatedDischargeTimeSeries(ContinuousTimeSeries):
@@ -345,7 +379,7 @@ def read_nwis_rdb(rdb_path):
 
 
 def read_nwis_csv(csv_path):
-    """Reads a CSV file containing NWIS data
+    """Reads a CSV file containing continuous NWIS data
 
     This function reads CSV files obtained using the
     dataRetrieval R package.
@@ -389,9 +423,13 @@ def read_nwis_csv(csv_path):
 
     index = pd.DatetimeIndex(dt_data)
 
-    stage_series = ObservedStageTimeSeries(pd.Series(index=index, data=h_data))
-    discharge_series = ObservedDischargeTimeSeries(
-        pd.Series(index=index, data=q_data))
+    index_diff = index[1] - index[0]
+    freq = float(index_diff/np.timedelta64(1, 's'))
+
+    stage_series = MeasuredStageTimeSeries(
+        pd.Series(index=index, data=h_data), freq)
+    discharge_series = RatedDischargeTimeSeries(
+        pd.Series(index=index, data=q_data), freq)
 
     return stage_series, discharge_series
 
