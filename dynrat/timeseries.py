@@ -49,6 +49,25 @@ class TimeSeries:
 
         return self._data.copy()
 
+    def fill(self, other):
+        """Fills values from other time series
+
+        Fills na values in this time series with values
+        from `other`.
+
+        Parameters
+        ----------
+        other : TimeSeries
+
+        """
+
+        na_observations = self._data.isna()
+        na_idx = self._data.index[na_observations]
+
+        fill_idx = other._data.index.isin(na_idx)
+
+        self._data[fill_idx] = other._data[fill_idx]
+
     @classmethod
     def from_aq_csv(cls, csv_path):
         """Reads time series from a CSV file obtained from
@@ -264,7 +283,7 @@ def read_nwis_rdb(rdb_path):
 
     Returns
     -------
-    pandas.Series, pandas.Series
+    ObservedStageTimeSeries, ObservedDischargeTimeSeries
         Stage, discharge time series
 
     """
@@ -315,6 +334,58 @@ def read_nwis_rdb(rdb_path):
         h_data.append(stage)
         q_data.append(discharge)
         dt_data.append(datetime)
+
+    index = pd.DatetimeIndex(dt_data)
+
+    stage_series = ObservedStageTimeSeries(pd.Series(index=index, data=h_data))
+    discharge_series = ObservedDischargeTimeSeries(
+        pd.Series(index=index, data=q_data))
+
+    return stage_series, discharge_series
+
+
+def read_nwis_csv(csv_path):
+    """Reads a CSV file containing NWIS data
+
+    This function reads CSV files obtained using the
+    dataRetrieval R package.
+
+    Parameters
+    ----------
+    csv_path : str
+        Path to NWIS CSV file
+
+    """
+
+    with open(csv_path) as f:
+        lines = f.readlines()
+
+    header = lines[0].strip().split(',')
+
+    dt_column = header.index('Date_Time')
+    tz_column = header.index('tz_cd')
+    q_column = header.index('Discharge')
+    h_column = header.index('Gage_Height')
+
+    dt_data = []
+    h_data = []
+    q_data = []
+
+    for line in lines[1:]:
+
+        line_data = line.strip().split(',')
+
+        datetime = pd.to_datetime(line_data[dt_column])
+        tz = line_data[tz_column]
+        datetime = datetime.tz_localize(tz)
+        datetime = datetime.tz_convert('UTC')
+        dt_data.append(datetime)
+
+        stage = float(line_data[h_column])
+        h_data.append(stage)
+
+        discharge = float(line_data[q_column])
+        q_data.append(discharge)
 
     index = pd.DatetimeIndex(dt_data)
 
