@@ -360,6 +360,42 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         return ax
 
+    def relative_error_plot(self, rated_discharge, ax=None):
+        """Plots relative error time series
+
+        Parameters
+        ----------
+        rated_discharge : RatedDischargeTimeSeries
+        ax : matplotlib.axes.Axes
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+
+        """
+
+        ax = self._time_series_axes(ax)
+
+        q_rated = rated_discharge.data()
+
+        intersect_idx = self._data.index.intersection(q_rated.index)
+
+        q_meas = q_rated[intersect_idx]
+        q_comp = self._data[intersect_idx]
+
+        relative_error = 100*(q_comp - q_meas)/q_meas
+
+        datetime = mdates.date2num(intersect_idx)
+
+        ax.plot(datetime, relative_error, label='Relative Error',
+                linestyle='solid', color='darkorchid')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Relative Error, in %')
+
+        ax.legend()
+
+        return ax
+
 
 def read_nwis_rdb(rdb_path):
     """Reads an NWIS RDB file containing field measurement
