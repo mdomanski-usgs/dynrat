@@ -413,6 +413,20 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         return pd.Series(index=intersect_idx, data=relative_error)
 
+    def rmse(self, rated_discharge):
+
+        q_rated = rated_discharge.data()
+
+        intersect_idx = self._data.index.intersection(q_rated.index)
+
+        q_meas = q_rated[intersect_idx]
+        q_comp = self._data[intersect_idx]
+
+        sq_error = (q_comp - q_meas)**2
+        rmse = np.sqrt(np.mean(sq_error))
+
+        return rmse
+
 
 def read_nwis_rdb(rdb_path):
     """Reads an NWIS RDB file containing field measurement
