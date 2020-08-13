@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -50,6 +51,17 @@ class TableFrict(Frict):
 
         if self._stage.size != self._roughness.size:
             raise ValueError("stage and roughness must have the same size")
+
+    def plot(self, ax=None):
+
+        if ax is None:
+            ax = plt.axes()
+
+        ax.plot(self._stage, self._roughness)
+        ax.set_xlabel('Stage, in ft')
+        ax.set_ylabel(r'Roughness, in ${s}{m^{-1/3}}$')
+
+        return ax
 
     def roughness(self, stage, *args):
         """Computes Manning's n for a particular elevation of the
