@@ -14,9 +14,9 @@ def stage_discharge_plot(stage, discharge, ax=None):
         h_series = stage.data()
         q_series = discharge.data()
 
-        union_idx = h_series.index.union(q_series.index)
+        inter_idx = h_series.index.intersection(q_series.index)
 
-        ax.plot(q_series[union_idx], h_series[union_idx],
+        ax.plot(q_series[inter_idx].values, h_series[inter_idx].values,
                 label='WSC Computed Discharge', linestyle='solid',
                 color='darkslategray')
 
