@@ -283,6 +283,50 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
 
 class MeasuredStageTimeSeries(ContinuousTimeSeries):
 
+    def cross_section_plot(self, xs, prop, ax=None):
+        """Plot time series of cross section property
+
+        Parameters
+        ----------
+        xs : Sect
+            Cross section for computing property
+        prop : {'top width', 'area'}
+            Cross section property to plot
+        ax : matplotlib.axes.Axes, optional
+            Axes to plot on
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+
+        """
+
+        if prop == 'top width':
+            xs_method = xs.top_width
+            label = 'Top width'
+        elif prop == 'area':
+            xs_method = xs.area
+            label = 'Area'
+        else:
+            raise ValueError("Unrecognized property: {}".format(prop))
+
+        xs_values = np.empty_like(self._data.values)
+        for i, v in enumerate(self._data.values):
+            try:
+                xs_values[i] = xs_method(v)
+            except ValueError:
+                xs_values[i] = np.nan
+
+        ax = self._time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.plot(datetime, xs_values, label=label)
+        ax.set_xlabel('Time')
+        ax.legend()
+
+        return ax
+
     def plot(self, ax=None):
 
         ax = self._time_series_axes(ax)
