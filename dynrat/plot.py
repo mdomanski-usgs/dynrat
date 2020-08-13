@@ -11,7 +11,12 @@ def stage_discharge_plot(stage, discharge, ax=None):
     if isinstance(stage, ContinuousTimeSeries) and \
             isinstance(discharge, ContinuousTimeSeries):
 
-        ax.plot(discharge.values(), stage.values(),
+        h_series = stage.data()
+        q_series = discharge.data()
+
+        union_idx = h_series.index.union(q_series.index)
+
+        ax.plot(q_series[union_idx], h_series[union_idx],
                 label='WSC Computed Discharge', linestyle='solid',
                 color='darkslategray')
 
