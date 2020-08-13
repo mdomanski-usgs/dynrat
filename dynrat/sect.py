@@ -3,6 +3,8 @@ from abc import abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
 
+from anchovy.crosssection import CrossSection as AnchovyXS
+
 from dynrat.frict import TableFrict
 
 
@@ -158,6 +160,17 @@ class CrossSect(Sect):
 
         return self._sect.area(stage)
 
+    @classmethod
+    def from_csv(cls, csv_path):
+
+        station, elevation = np.loadtxt(
+            csv_path, delimiter=',', skiprows=1, unpack=True)
+
+        # roughness isn't used here
+        xs = AnchovyXS(station, elevation, 0.035)
+
+        return cls(xs)
+
     def plot(self, ax=None):
         """Plots the coordinates of this cross section
 
@@ -176,25 +189,6 @@ class CrossSect(Sect):
         ax.set_ylabel('Stage, in feet')
 
         return ax
-
-    def roughness(self, stage):
-        """Computes the roughness of this cross section at a given stage
-
-        Parameters
-        ----------
-        stage : float
-
-        Returns
-        -------
-        float
-
-        """
-
-        if stage < self._e_min or self._e_max < stage:
-            raise ValueError(
-                "Stage is outside of the range of this cross section")
-
-        return self._frict.roughness(stage)
 
     def top_width(self, stage):
         """Computes the top width for this cross section at a given stage
