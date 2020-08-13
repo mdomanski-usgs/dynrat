@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+
+from dynrat.timeseries import ComputedDischargeTimeSeries
 
 
 class QTimeSeries:
@@ -7,26 +10,26 @@ class QTimeSeries:
 
         self._solver = solver
 
-    def solve_ts(self, h_time_series, q0, h0):
+    def solve_ts(self, stage_time_series, q0):
         """Solve discharge from stage time series
 
         Parameters
         ----------
-        h_time_series : array_like
+        MeasuredStageTimeSeries
             Stage time series
         q0 : float
             Starting value of discharge
-        h0 : float
-            Starting value of stage
 
         Returns
         -------
-        ndarray
-            Discharge time series
+        ComputedDischargeTimeSeries
 
         """
 
-        h = np.array(h_time_series)
+        stage_series = stage_time_series.data()
+
+        h = stage_series.values[1:]
+        h0 = stage_series.values[0]
 
         q = np.nan * np.empty_like(h)
 
@@ -38,4 +41,6 @@ class QTimeSeries:
             except RuntimeError:
                 break
 
-        return q
+        q_series = pd.Series(index=stage_series.index[1:], data=q)
+
+        return ComputedDischargeTimeSeries(q_series)
