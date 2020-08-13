@@ -360,7 +360,7 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         return ax
 
-    def relative_error_plot(self, rated_discharge, ax=None):
+    def plot_relative_error(self, rated_discharge, ax=None):
         """Plots relative error time series
 
         Parameters
@@ -376,6 +376,32 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         ax = self._time_series_axes(ax)
 
+        relative_error = self.relative_error(rated_discharge)
+
+        datetime = mdates.date2num(relative_error.index)
+
+        ax.plot(datetime, relative_error.values, label='Relative Error',
+                linestyle='solid', color='darkorchid')
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Relative Error, in %')
+
+        ax.legend()
+
+        return ax
+
+    def relative_error(self, rated_discharge):
+        """Computes relative error
+
+        Paramters
+        ---------
+        rated_discharge : RatedDischargeTimeSeries
+
+        Returns
+        -------
+        pandas.Series
+
+        """
+
         q_rated = rated_discharge.data()
 
         intersect_idx = self._data.index.intersection(q_rated.index)
@@ -385,16 +411,7 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         relative_error = 100*(q_comp - q_meas)/q_meas
 
-        datetime = mdates.date2num(intersect_idx)
-
-        ax.plot(datetime, relative_error, label='Relative Error',
-                linestyle='solid', color='darkorchid')
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Relative Error, in %')
-
-        ax.legend()
-
-        return ax
+        return pd.Series(index=intersect_idx, data=relative_error)
 
 
 def read_nwis_rdb(rdb_path):
