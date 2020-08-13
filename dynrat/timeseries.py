@@ -53,20 +53,31 @@ class TimeSeries:
         """Fills values from other time series
 
         Fills na values in this time series with values
-        from `other`.
+        from `other`. Returns a new time series object.
 
         Parameters
         ----------
         other : TimeSeries
+
+        Returns
+        -------
+        TimeSeries
 
         """
 
         na_observations = self._data.isna()
         na_idx = self._data.index[na_observations]
 
-        fill_idx = other._data.index.isin(na_idx)
+        isin_other = other._data.index.isin(na_idx)
+        isin_idx = other._data.index[isin_other]
 
-        self._data[fill_idx] = other._data[fill_idx]
+        fill_idx = na_idx.intersection(isin_idx)
+
+        data = self._data.copy()
+
+        data[fill_idx] = other._data[fill_idx]
+
+        return self.__class__(data)
 
     @classmethod
     def from_aq_csv(cls, csv_path):
