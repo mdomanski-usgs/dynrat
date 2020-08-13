@@ -345,6 +345,24 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
 
 class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
+    def mean_error(self, rated_discharge, relative=False):
+
+        q_rated = rated_discharge.data()
+
+        intersect_idx = self._data.index.intersection(q_rated.index)
+
+        q_meas = q_rated[intersect_idx]
+        q_comp = self._data[intersect_idx]
+
+        error = q_comp - q_meas
+
+        if relative:
+            error = 100 * error / q_meas
+
+        mean_error = np.mean(error)
+
+        return mean_error
+
     def plot(self, ax=None):
 
         ax = self._time_series_axes(ax)
