@@ -50,36 +50,6 @@ class TimeSeries:
 
         return self._data.copy()
 
-    def dt_subset(self, start=None, end=None):
-        """Return a subset of this time series based on
-        datetime values
-
-        Parameters
-        ----------
-        start : str or pandas.Timestamp, optional
-        end : str or pandas.Timestamp, optional
-
-        Returns
-        -------
-        TimeSeries
-            Subset of this time series
-
-        """
-
-        subset_tf = np.full_like(self._data.index, True, bool)
-
-        if start is not None:
-            start_dt = pd.to_datetime(start)
-            after_start_tf = self._data.index >= start_dt
-            subset_tf = subset_tf & after_start_tf
-
-        if end is not None:
-            end_dt = pd.to_datetime(end)
-            before_end_tf = self._data.index <= end_dt
-            subset_tf = subset_tf & before_end_tf
-
-        return self.__class__(self._data[subset_tf])
-
     def fill(self, other):
         """Fills values from other time series
 
@@ -142,6 +112,40 @@ class TimeSeries:
         """
 
         return self._data.isna().sum()
+
+    def subset_dt(self, start=None, end=None):
+        """Return a subset of this time series based on
+        datetime values
+
+        Parameters
+        ----------
+        start : str or pandas.Timestamp, optional
+        end : str or pandas.Timestamp, optional
+
+        Returns
+        -------
+        TimeSeries
+            Subset of this time series
+
+        """
+
+        subset_tf = np.full_like(self._data.index, True, bool)
+
+        if start is not None:
+            start_dt = pd.to_datetime(start)
+            if start_dt.tz is None:
+                start_dt = start_dt.tz_localize(self._data.index.tz)
+            after_start_tf = self._data.index >= start_dt
+            subset_tf = subset_tf & after_start_tf
+
+        if end is not None:
+            end_dt = pd.to_datetime(end)
+            if end_dt.tz is None:
+                end_dt = end_dt.tz_localize(self._data.index.tz)
+            before_end_tf = self._data.index <= end_dt
+            subset_tf = subset_tf & before_end_tf
+
+        return self.__class__(self._data[subset_tf])
 
     def values(self):
         """Returns an array of observed values in this time
