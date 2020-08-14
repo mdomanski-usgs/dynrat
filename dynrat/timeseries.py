@@ -33,7 +33,8 @@ class TimeSeries:
         if ax is None:
             ax = plt.axes()
 
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y'))
+        plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
 
         return ax
 
@@ -48,6 +49,36 @@ class TimeSeries:
         """
 
         return self._data.copy()
+
+    def dt_subset(self, start=None, end=None):
+        """Return a subset of this time series based on
+        datetime values
+
+        Parameters
+        ----------
+        start : str or pandas.Timestamp, optional
+        end : str or pandas.Timestamp, optional
+
+        Returns
+        -------
+        TimeSeries
+            Subset of this time series
+
+        """
+
+        subset_tf = np.full_like(self._data.index, True, bool)
+
+        if start is not None:
+            start_dt = pd.to_datetime(start)
+            after_start_tf = self._data.index >= start_dt
+            subset_tf = subset_tf & after_start_tf
+
+        if end is not None:
+            end_dt = pd.to_datetime(end)
+            before_end_tf = self._data.index <= end_dt
+            subset_tf = subset_tf & before_end_tf
+
+        return self.__class__(self._data[subset_tf])
 
     def fill(self, other):
         """Fills values from other time series
@@ -273,7 +304,6 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
         ax.plot(datetime, self._data.values,
                 label='WSC Computed Discharge', linestyle='solid',
                 color='darkslategray')
-        ax.set_xlabel('Time')
         ax.set_ylabel('Discharge, in cfs')
 
         ax.legend()
@@ -322,7 +352,6 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
         ax.plot(datetime, xs_values, label=label)
-        ax.set_xlabel('Time')
         ax.legend()
 
         return ax
@@ -335,7 +364,6 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
 
         ax.plot(datetime, self._data.values, label='Measured Stage',
                 linestyle='solid', color='darkslategray')
-        ax.set_xlabel('Time')
         ax.set_ylabel('Stage, in ft')
 
         ax.legend()
@@ -371,7 +399,6 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         ax.plot(datetime, self._data.values, label='DYNRAT Computed Discharge',
                 linestyle='solid', color='dodgerblue')
-        ax.set_xlabel('Time')
         ax.set_ylabel('Discharge, in csf')
 
         ax.legend()
@@ -400,7 +427,6 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
         ax.plot(datetime, relative_error.values, label='Relative Error',
                 linestyle='solid', color='darkorchid')
-        ax.set_xlabel('Time')
         ax.set_ylabel('Relative Error, in %')
 
         ax.legend()
@@ -410,8 +436,8 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
     def relative_error(self, rated_discharge):
         """Computes relative error
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         rated_discharge : RatedDischargeTimeSeries
 
         Returns
