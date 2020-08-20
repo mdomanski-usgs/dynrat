@@ -9,8 +9,12 @@ References
 
 """
 
+import logging
+
 import numpy as np
 from scipy.optimize import newton
+
+from dynrat import ch
 
 
 GRAVITY = 32.2
@@ -41,6 +45,10 @@ class QSolve:
         self._sect = sect
         self._slope_ratio = slope_ratio
         self._time_step = time_step
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.addHandler(ch)
+        self.logger.setLevel(logging.CRITICAL)
 
     def _dh(self, h, h_prime):
         return (h - h_prime) / self._time_step
@@ -171,15 +179,23 @@ class QSolve:
         if q0 is None:
             q0 = q_prime
 
-        q = newton(
+        root, r = newton(
             lambda q: self._f(
                 q, l2, l3, l4, l5, l6),
             q0,
             lambda q: self._f_prime(
                 q, l2, l3, l4, l5, l6),
-            tol=tol)
+            full_output=True, tol=tol, disp=False)
 
-        return q
+        if not r.converged:
+            self.logger.error("dynmod solver failed to converge after "
+                              + "{} iterations".format(r.iterations))
+        else:
+            self.logger.debug("Converged at value " +
+                              "{} after {} iterations".format(root,
+                                                              r.iterations))
+
+        return root
 
     def zero_func(self, h, h_prime, q, q_prime):
         """Iterative solution zero function
