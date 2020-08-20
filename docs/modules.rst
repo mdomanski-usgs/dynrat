@@ -9,4 +9,5 @@ dynrat package
    plot
    rslope
    sect
+   solve
    timeseries
