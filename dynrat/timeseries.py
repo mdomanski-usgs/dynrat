@@ -499,7 +499,8 @@ def read_nwis_rdb(rdb_path):
                   'MST': 'MST7MDT',
                   'MDT': 'MST7MDT',
                   'PST': 'PST7PDT',
-                  'PDT': 'PST7PDT'}
+                  'PDT': 'PST7PDT',
+                  '': 'UTC'}
 
     with open(rdb_path) as f:
         lines = f.readlines()
@@ -526,10 +527,18 @@ def read_nwis_rdb(rdb_path):
 
         try:
             datetime = pd.to_datetime(line_data[dt_column])
-            stage = float(line_data[h_column])
-            discharge = float(line_data[q_column])
         except IndexError:
             continue
+
+        try:
+            stage = float(line_data[h_column])
+        except (IndexError, ValueError):
+            stage = np.nan
+
+        try:
+            discharge = float(line_data[q_column])
+        except (IndexError, ValueError):
+            discharge = np.nan
 
         tz = line_data[tz_column]
         datetime = datetime.tz_localize(time_zones[tz])
@@ -548,7 +557,7 @@ def read_nwis_rdb(rdb_path):
     return stage_series, discharge_series
 
 
-def read_nwis_csv(csv_path):
+def read_nwis_csv(csv_path, freq=None, interp_missing=False):
     """Reads a CSV file containing continuous NWIS data
 
     This function reads CSV files obtained using the
@@ -558,6 +567,12 @@ def read_nwis_csv(csv_path):
     ----------
     csv_path : str
         Path to NWIS CSV file
+    freq : float, optional
+    interp_missing : boolean, optional
+
+    Returns
+    -------
+    MeasuredStageTimeSeries, RatedDischargeTimeSeries
 
     """
 
@@ -566,10 +581,10 @@ def read_nwis_csv(csv_path):
 
     header = lines[0].strip().split(',')
 
-    dt_column = header.index('Date_Time')
-    tz_column = header.index('tz_cd')
-    q_column = header.index('Discharge')
-    h_column = header.index('Gage_Height')
+    dt_column = header.index('"dateTime"')
+    tz_column = header.index('"tz_cd"')
+    q_column = header.index('"X_00060_00000"')
+    h_column = header.index('"X_00065_00000"')
 
     dt_data = []
     h_data = []
@@ -580,25 +595,32 @@ def read_nwis_csv(csv_path):
         line_data = line.strip().split(',')
 
         datetime = pd.to_datetime(line_data[dt_column])
-        tz = line_data[tz_column]
+        tz = line_data[tz_column].strip('"')
         datetime = datetime.tz_localize(tz)
         datetime = datetime.tz_convert('UTC')
         dt_data.append(datetime)
 
-        stage = float(line_data[h_column])
+        try:
+            stage = float(line_data[h_column])
+        except ValueError:
+            stage = np.nan
         h_data.append(stage)
 
-        discharge = float(line_data[q_column])
+        try:
+            discharge = float(line_data[q_column])
+        except ValueError:
+            discharge = np.nan
         q_data.append(discharge)
 
     index = pd.DatetimeIndex(dt_data)
 
-    index_diff = index[1] - index[0]
-    freq = float(index_diff/np.timedelta64(1, 's'))
+    if freq is None:
+        index_diff = index[1] - index[0]
+        freq = float(index_diff/np.timedelta64(1, 's'))
 
     stage_series = MeasuredStageTimeSeries(
-        pd.Series(index=index, data=h_data), freq)
+        pd.Series(index=index, data=h_data), freq, interp_missing)
     discharge_series = RatedDischargeTimeSeries(
-        pd.Series(index=index, data=q_data), freq)
+        pd.Series(index=index, data=q_data), freq, interp_missing)
 
     return stage_series, discharge_series
