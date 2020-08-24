@@ -9,13 +9,16 @@ References
 
 """
 
-import logging
+# import logging
 
 import numpy as np
 from scipy.optimize import newton
 
-from dynrat import ch
+import dynrat
 
+
+# module-level logger
+logger = dynrat.logger.getChild(__name__)
 
 GRAVITY = 32.2
 
@@ -46,9 +49,8 @@ class QSolve:
         self._slope_ratio = slope_ratio
         self._time_step = time_step
 
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.addHandler(ch)
-        self.logger.setLevel(logging.CRITICAL)
+        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger.debug('Initialized {}'.format(self.__class__.__name__))
 
     def _dh(self, h, h_prime):
         return (h - h_prime) / self._time_step

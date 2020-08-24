@@ -3,8 +3,12 @@ import logging
 import numpy as np
 import pandas as pd
 
-from dynrat import ch
+import dynrat
 from dynrat.timeseries import ComputedDischargeTimeSeries
+
+
+# module-level logger
+logger = dynrat.logger.getChild(__name__)
 
 
 class QTimeSeries:
@@ -12,9 +16,7 @@ class QTimeSeries:
     def __init__(self, solver):
 
         self._solver = solver
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.setLevel(logging.CRITICAL)
-        self.logger.addHandler(ch)
+        self.logger = logger.getChild(self.__class__.__name__)
 
     def solve_ts(self, stage_time_series, q0):
         """Solve discharge from stage time series
@@ -46,7 +48,7 @@ class QTimeSeries:
             if np.isnan(q[i]):
                 dt_step = stage_series.index[i]
                 self.logger.error("NaN encountered at index " +
-                                  " {}, index {}".format(i, dt_step))
+                                  " {}, timestamp {}".format(i, dt_step))
                 break
 
         q_series = pd.Series(index=stage_series.index[1:], data=q)
