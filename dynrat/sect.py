@@ -5,7 +5,10 @@ import numpy as np
 
 from anchovy.crosssection import CrossSection as AnchovyXS
 
+import dynrat
 from dynrat.frict import TableFrict
+
+logger = dynrat.logger.getChild(__name__)
 
 
 class Sect:
@@ -52,6 +55,9 @@ class TableSect(Sect):
         self._stage = np.array(stage)
         self._area = np.array(area)
         self._top_width = np.array(top_width)
+
+        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger.debug("Initializing {}".format(self.__class__.__name__))
 
         if self._stage.ndim != 1:
             raise ValueError("stage must be one-dimensional")
@@ -141,6 +147,9 @@ class CrossSect(Sect):
         self._sect = TableSect(e, area, top_width)
         self._frict = TableFrict(e, roughness)
 
+        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger.debug("Initializing {}".format(self.__class__.__name__))
+
     def area(self, stage):
         """Computes area of this cross section
 
@@ -154,14 +163,21 @@ class CrossSect(Sect):
 
         """
 
+        if not np.isfinite(stage):
+            self.logger.warning("Non-finite stage passed to area method")
+
         if stage < self._e_min or self._e_max < stage:
-            raise ValueError(
-                "Stage is outside of the range of this cross section")
+            self.logger.warning(
+                "Stage {} is outside of ".format(stage) +
+                "the range of this cross section")
+            return self._xs.area(stage)
 
         return self._sect.area(stage)
 
     @classmethod
     def from_csv(cls, csv_path):
+
+        logger.debug("Initializing {} from {}".format(cls.__name__, csv_path))
 
         station, elevation = np.loadtxt(
             csv_path, delimiter=',', skiprows=1, unpack=True)
@@ -203,8 +219,13 @@ class CrossSect(Sect):
 
         """
 
+        if not np.isfinite(stage):
+            self.logger.warning("Non-finite stage passed to top width method")
+
         if stage < self._e_min or self._e_max < stage:
-            raise ValueError(
-                "Stage is outside of the range of this cross section")
+            self.logger.warning(
+                "Stage {} is outside of ".format(stage) +
+                "the range of this cross section")
+            return self._xs.top_width(stage)
 
         return self._sect.top_width(stage)

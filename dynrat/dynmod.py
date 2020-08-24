@@ -50,7 +50,6 @@ class QSolve:
         self._time_step = time_step
 
         self.logger = logger.getChild(self.__class__.__name__)
-        self.logger.debug('Initialized {}'.format(self.__class__.__name__))
 
     def _dh(self, h, h_prime):
         return (h - h_prime) / self._time_step
@@ -193,7 +192,7 @@ class QSolve:
             self.logger.error("dynmod solver failed to converge after "
                               + "{} iterations".format(r.iterations))
         else:
-            self.logger.debug("Converged at value " +
+            self.logger.debug("Converged to value " +
                               "{} after {} iterations".format(root,
                                                               r.iterations))
 

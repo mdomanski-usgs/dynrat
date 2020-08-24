@@ -48,7 +48,7 @@ class QTimeSeries:
             if np.isnan(q[i]):
                 dt_step = stage_series.index[i]
                 self.logger.error("NaN encountered at index " +
-                                  " {}, timestamp {}".format(i, dt_step))
+                                  "{}, timestamp {}".format(i, dt_step))
                 break
 
         q_series = pd.Series(index=stage_series.index[1:], data=q)
