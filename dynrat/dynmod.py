@@ -54,8 +54,7 @@ class QSolve:
     def _dh(self, h, h_prime):
         return (h - h_prime) / self._time_step
 
-    @classmethod
-    def _f(cls, q, l2, l3, l4, l5, l6):
+    def _f(self, q, l2, l3, l4, l5, l6):
         """Zero function.
 
         This private method is meant to be used internally during the
@@ -63,12 +62,20 @@ class QSolve:
         not need to be computed for every iteration.
         """
 
-        l0 = cls._L0(q, l3, l4, l5, l6)
+        l0 = self._L0(q, l3, l4, l5, l6)
 
-        return q - l2 * l0**(1 / 2)
+        f = q - l2 * l0**(1 / 2)
 
-    @classmethod
-    def _f_prime(cls, q, l2, l3, l4, l5, l6):
+        self.logger.debug("f computed {}".format(f))
+
+        if not np.isfinite(f):
+            self.logger.error(
+                "f computed a non-finite value")
+            raise RuntimeError("Non-finite value computed")
+
+        return f
+
+    def _f_prime(self, q, l2, l3, l4, l5, l6):
         """Derivative (with respect to q) of the zero function.
 
         This private method is meant to be used internally during the
@@ -76,10 +83,19 @@ class QSolve:
         not need to be computed for every iteration.
         """
 
-        l0 = cls._L0(q, l3, l4, l5, l6)
-        l1 = cls._L1(q, l4, l5, l6)
+        l0 = self._L0(q, l3, l4, l5, l6)
+        l1 = self._L1(q, l4, l5, l6)
 
-        return 1 - 0.5 * l2 * l1 / l0**(1 / 2)
+        f_prime = 1 - 0.5 * l2 * l1 / l0**(1 / 2)
+
+        self.logger.debug("f_prime computed {}".format(f_prime))
+
+        if not np.isfinite(f_prime):
+            self.logger.error(
+                "f_prime computed a non-finite value")
+            raise RuntimeError("Non-finite value computed")
+
+        return f_prime
 
     def _K(self, h, h_prime):
 

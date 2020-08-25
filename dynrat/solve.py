@@ -44,12 +44,21 @@ class QTimeSeries:
         q[0] = self._solver.q_solve(h[0], h0, q0)
 
         for i in range(1, len(h)):
-            q[i] = self._solver.q_solve(h[i], h[i - 1], q[i - 1])
+
+            try:
+                q[i] = self._solver.q_solve(h[i], h[i - 1], q[i - 1])
+            except RuntimeError:
+                q[i] = np.nan
+
+            dt_step = stage_series.index[i]
+
             if np.isnan(q[i]):
-                dt_step = stage_series.index[i]
                 self.logger.error("NaN encountered at index " +
                                   "{}, timestamp {}".format(i, dt_step))
                 break
+            else:
+                self.logger.debug(
+                    "Computed {} for timestamp {}".format(q[i], dt_step))
 
         q_series = pd.Series(index=stage_series.index[1:], data=q)
 
