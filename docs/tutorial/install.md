@@ -8,7 +8,7 @@ version of Python. There are other options, but they are not covered here.
 
 ### Download Python
 Go to the [Python downloads page][1] and download the installer for the latest
-release of the Python 3.7. As of this writing, the latest version is 3.7.7.
+release of the Python 3.7. As of this writing, the latest version is 3.7.9.
 
 ### Install Python
 Run the installer. You may install Python using the "Just me" option if you
@@ -22,7 +22,7 @@ the tutorial, you should get similar output as shown below.
 
 ```
 >python --version
-Python 3.7.7
+Python 3.7.9
 ```
 
 Return to [Check your installation][4].
@@ -54,6 +54,12 @@ x64
 To run VSCode, either type `code` in the command line or start Visual Studio
 Code from the start menu.
 
+### Install the Python extension
+The VSCode Python extension provides a lot of Python development support.
+After opening a Python source file for the first time, VSCode will recommend
+that you install the Python extension. You can either install the extension
+this way or visit [this site][5] and follow the instructions.
+
 Return to [Check your installation][4].
 
 ## Installing Git
@@ -84,3 +90,4 @@ Return to [Check your installation][4].
 [2]: https://code.visualstudio.com/download
 [3]: https://git-scm.com/
 [4]: setup.md#check-your-installation
+[5]: https://marketplace.visualstudio.com/items?itemName=ms-python.python
