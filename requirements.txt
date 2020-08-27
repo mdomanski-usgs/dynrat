@@ -1,10 +1,10 @@
 autopep8
 notebook
-numpy
-pandas
+numpy==1.18.1
+pandas==1.0.1
 pylint
 recommonmark
 rope
 rstcheck
-scipy
+scipy==1.4.1
 Sphinx
