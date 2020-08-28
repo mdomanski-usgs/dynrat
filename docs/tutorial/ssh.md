@@ -46,7 +46,7 @@ $ ssh-add ~/.ssh/id_rsa
 ```
 
 ## Add the key to code.usgs.gov
-Log in to your USGS GitLab account at [code.usgs.gov](https://code.usgs.gov>).
+Log in to your USGS GitLab account at [code.usgs.gov](https://code.usgs.gov).
 
 In the upper-right corner of any page, click on your profile photo, then click
 **Settings**.
