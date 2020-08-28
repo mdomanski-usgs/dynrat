@@ -12,11 +12,17 @@ Follow [these instructions][1] to download the SSL intercept certificate. Note
 the directory you placed the certificate in.
 
 ## Configure the pip SSL certificate
-Find or create your pip.ini file. The file is located in `%AppData%\pip`. You
-can type `%AppData%` into the Windows Explorer address bar to navigate to the
-appropriate directory. If the pip directory doesn't exist in the directory,
-create it and navigate into it. If pip.ini doesn't exist, create it as a new
-text file.
+Find or create your pip.ini file. The file is located in `%AppData%\pip`.
+
+The pip directory may not exist under `%AppData%`.
+
+If the pip directory doesn't exist in the `%AppData%` directory, create it and
+navigate into it.
+
+You can type `%AppData%` into the Windows Explorer address bar to navigate to the
+appropriate directory.
+
+If pip.ini doesn't exist, create it as a new text file.
 
 Add the following lines to your pip.ini file, where `<pathToYourCertFile>` is
 the path to the SSL certificate file you downloaded in the previous step.
@@ -26,7 +32,6 @@ the path to the SSL certificate file you downloaded in the previous step.
 cert=<pathToYourCertFile>
 ```
 
-Return to
-[Install the required packages](setup.md#install-the-required-packages).
+Return to [Setting up the development environment](setup).
 
 [1]: https://github.com/usgs/best-practices/blob/master/ssl/WorkingWithinSSLIntercept.md#0-get-the-ssl-intercept-root-certificate

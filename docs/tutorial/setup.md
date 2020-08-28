@@ -1,46 +1,8 @@
 # Setting up the development environment
 
 ## Check your installation
-
-### Check your Python version
-dynrat requires Python 3.7. To check your Python version, open a command prompt
-and type the following command.
-
-```
->python --version
-```
-
-The output of the command will show the Python version. If the command fails,
-or the version shown isn't 3.7, see [Installing python](install.md#installing-python).
-
-### Check for an IDE
-If you are going to be editing code, it is generally recommended that you use
-an IDE. If you don't plan on editing or viewing code, you may skip this step.
-
-There is no requirement of which IDE to use, but if you aren't familiar with an
-IDE, I recommend using Visual Studio Code (VSCode). To see if VSCode is
-installed, you can either start search for it from the Windows Start menu, or
-you can type the following command into the command prompt to start the
-program.
-
-```
->code
-```
-
-If you're unable to locate VSCode on your system, see
-[Installing Visual Studio Code](install.md#installing-visual-studio-code).
-
-### Check for a Git installation
-You must have Git installed in order to clone the remote dynrat repository. To
-see if Git is installed on your system, type the following command into a
-command prompt.
-
-```
->git --version
-```
-
-This will display the version of Git installed on your system. If the command
-fails, see [Installing Git](install.md#installing-git).
+First, check to see if the required applications are installed on your machine.
+See [this document](check) for instructions on how to check your installation.
 
 ## Clone the repositories
 When you clone a repository, you tell the Git client on your local machine to
@@ -91,7 +53,7 @@ Welcome to GitLab, @mdomanski!
 ```
 
 If the command fails,
-see [Setting up GitLab SSH](ssh.md).
+see [Setting up GitLab SSH](ssh).
 
 ### Clone the anchovy and dynrat repositories
 anchovy contains functionality to compute cross section geometry and is a
@@ -155,10 +117,10 @@ this tutorial, for instance), type the following command
 >env\Scripts\activate
 ```
 
-You must activate the virtual environment when you work with the dynrat package
-in the future. If you work with VSCode, the IDE will activate the environment
-in the terminal after the Python extension is loaded and a new terminal is
-opened.
+You must activate the virtual environment when you work within the dynrat
+environment in the future. If you work with VSCode, the IDE will activate the
+environment in the terminal after the Python extension is loaded and a new
+terminal is opened.
 
 ### Install anchovy
 In order for the Python interpreter in the dynrat environment to have "global"
@@ -172,17 +134,18 @@ anchovy repository in the parent directory.
 (env) $ pip install -e ../aluminumanchovy
 ```
 
-The `-e` option tells pip to install the anchovy package in "editable" mode.
-See [Editable installs](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs) for more info. `../aluminumanchovy` tells pip to look for a `setup.py` file in
+pip is the standard Python package management system. The `-e` option tells pip
+to install the anchovy package in "editable" mode (see
+[Editable installs](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs)
+for more info). `../aluminumanchovy` tells pip to look for a setup.py file in
 the directory named aluminumanchovy which is one level above the current
-working directory. The `setup.py` file tells pip what to install, among other
-things.
+working directory.
 
 ### Install the required packages
 In the dynrat repository, there is a file named `requirements.txt` that
 contains a list of Python packages that are required by dynrat. The
-requirements file is used with pip (the standard Python package management
-system) to install the required packages in the new environment.
+requirements file is used with pip to install the required packages in the new
+environment.
 
 Type the following command to install the required packages in the new
 environment.

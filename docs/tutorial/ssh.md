@@ -6,7 +6,7 @@ public key to your code.usgs.gov account.
 First, start Git Bash (available after installing Git for Windows).
 
 For more detailed information, see
-[GitLab and SSH keys](https://code.usgs.gov/help/ssh/README.md>).
+[GitLab and SSH keys](https://code.usgs.gov/help/ssh/README.md).
 
 ## Check for existing SSH keys
 Type `ls -al ~/.ssh` into the terminal. If you already have existing SSH
@@ -73,4 +73,4 @@ Verify SSH is working by typing the following command into Git Bash.
 $ ssh -T git@code.usgs.gov
 ```
 
-Return to [Clone the repository](setup.md#clone-the-repository)
+Return to [Setting up the development environment](setup).
