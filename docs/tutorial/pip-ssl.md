@@ -32,6 +32,6 @@ the path to the SSL certificate file you downloaded in the previous step.
 cert=<pathToYourCertFile>
 ```
 
-Return to [Setting up the development environment](setup).
+Return to [Setting up the development environment](setup.md).
 
 [1]: https://github.com/usgs/best-practices/blob/master/ssl/WorkingWithinSSLIntercept.md#0-get-the-ssl-intercept-root-certificate

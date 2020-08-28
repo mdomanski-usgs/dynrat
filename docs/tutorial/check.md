@@ -9,7 +9,7 @@ and type the following command.
 ```
 
 The output of the command will show the Python version. If the command fails,
-or the version shown isn't 3.7, see [Installing python](install_python).
+or the version shown isn't 3.7, see [Installing python](install_python.md).
 
 ## Check for an IDE
 If you are going to be editing code, it is generally recommended that you use
@@ -26,7 +26,7 @@ program.
 ```
 
 If you're unable to locate VSCode on your system, see
-[Installing Visual Studio Code](install_vscode).
+[Installing Visual Studio Code](install_vscode.md).
 
 ## Check for a Git installation
 You must have Git installed in order to clone the remote dynrat repository. To
@@ -38,6 +38,6 @@ command prompt.
 ```
 
 This will display the version of Git installed on your system. If the command
-fails, see [Installing Git](install_git).
+fails, see [Installing Git](install_git.md).
 
 Return to [Setting up the development environment](setup.md).

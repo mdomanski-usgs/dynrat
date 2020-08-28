@@ -73,4 +73,4 @@ Verify SSH is working by typing the following command into Git Bash.
 $ ssh -T git@code.usgs.gov
 ```
 
-Return to [Setting up the development environment](setup).
+Return to [Setting up the development environment](setup.md).

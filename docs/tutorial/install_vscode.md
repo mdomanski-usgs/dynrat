@@ -31,7 +31,7 @@ After opening a Python source file for the first time, VSCode will recommend
 that you install the Python extension. You can either install the extension
 this way or visit [this site][2] and follow the instructions.
 
-Return to [Check your installation](check).
+Return to [Check your installation](check.md).
 
 [1]: https://code.visualstudio.com/download
 [2]: https://marketplace.visualstudio.com/items?itemName=ms-python.python

@@ -20,7 +20,7 @@ worked, you will see the version number as the output.
 git version 2.21.0.windows.1
 ```
 
-Return to [Check your installation](check).
+Return to [Check your installation](check.md).
 
 
 [1]: https://git-scm.com/

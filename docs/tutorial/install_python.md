@@ -23,6 +23,6 @@ the tutorial, you should get similar output as shown below.
 Python 3.7.9
 ```
 
-Return to [Check your installation](check).
+Return to [Check your installation](check.md).
 
 [1]: https://www.python.org/downloads/

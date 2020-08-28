@@ -2,7 +2,8 @@
 
 ## Check your installation
 First, check to see if the required applications are installed on your machine.
-See [this document](check) for instructions on how to check your installation.
+See [this document](check.md) for instructions on how to check your
+installation.
 
 ## Clone the repositories
 When you clone a repository, you tell the Git client on your local machine to
@@ -53,7 +54,7 @@ Welcome to GitLab, @mdomanski!
 ```
 
 If the command fails,
-see [Setting up GitLab SSH](ssh).
+see [Setting up GitLab SSH](ssh.md).
 
 ### Clone the anchovy and dynrat repositories
 anchovy contains functionality to compute cross section geometry and is a
