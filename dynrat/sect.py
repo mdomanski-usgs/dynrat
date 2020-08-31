@@ -35,9 +35,8 @@ class TableSect(Sect):
 
     The cross section property methods of this class
     linearly interpolate cross section properties with
-    stage. `stage`, `area`, and `top_width` must be one-
-    dimensional and have two or more elements. `stage` must
-    be sorted in ascending order.
+    stage. The property arrays are defined in kwargs.
+    ``'stage'`` must be defined in kwargs.
 
     Parameters
     ----------
@@ -124,12 +123,13 @@ class CrossSect(Sect):
 
         e = np.linspace(self._e_min, self._e_max)
 
-        area = xs.area(e)
-        top_width = xs.top_width(e)
-        roughness = xs.roughness(e)
+        kwargs = {'stage': e,
+                  'area': xs.area(e),
+                  'conveyance': xs.conveyance(e),
+                  'top_width': xs.top_width(e),
+                  'vel_dist_factor': xs.vel_dist_factor(e)}
 
-        self._sect = TableSect(stage=e, area=area, top_width=top_width)
-        self._frict = TableFrict(e, roughness)
+        self._sect = TableSect(**kwargs)
 
         self.logger = logger.getChild(self.__class__.__name__)
         self.logger.debug("Initializing {}".format(self.__class__.__name__))
@@ -157,6 +157,19 @@ class CrossSect(Sect):
             return self._xs.area(stage)
 
         return self._sect.area(stage)
+
+    def conveyance(self, stage):
+
+        if not np.isfinite(stage):
+            self.logger.warning("Non-finite stage passed to conveyance method")
+
+        if stage < self._e_min or self._e_max < stage:
+            self.logger.warning(
+                "Stage {} is outside of ".format(stage) +
+                "the range of this cross section")
+            return self._xs.conveyance(stage)
+
+        return self._sect.conveyance(stage)
 
     @classmethod
     def from_csv(cls, csv_path):
@@ -213,3 +226,17 @@ class CrossSect(Sect):
             return self._xs.top_width(stage)
 
         return self._sect.top_width(stage)
+
+    def vel_dist_factor(self, stage):
+
+        if not np.isfinite(stage):
+            self.logger.warning(
+                "Non-finite stage passed to vel_dist_factor method")
+
+        if stage < self._e_min or self._e_max < stage:
+            self.logger.warning(
+                "Stage {} is outside of ".format(stage) +
+                "the range of this cross section")
+            return self._xs.vel_dist_factor(stage)
+
+        return self._sect.vel_dist_factor(stage)
