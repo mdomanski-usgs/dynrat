@@ -41,23 +41,22 @@ class TableSect(Sect):
 
     Parameters
     ----------
-    stage : array_like
-        Stage
-    area : array_like
-        Cross section area
-    top_width : array_like
-        Cross section top width
+    kwargs : dict
 
     """
 
-    def __init__(self, stage, area, top_width):
+    def __init__(self, **kwargs):
 
-        self._stage = np.array(stage)
-        self._area = np.array(area)
-        self._top_width = np.array(top_width)
+        self._methods = []
 
         self.logger = logger.getChild(self.__class__.__name__)
-        self.logger.debug("Initializing {}".format(self.__class__.__name__))
+
+        stage = kwargs.pop('stage', None)
+
+        if stage is None:
+            raise RuntimeError("stage must be passed as a kwarg")
+
+        self._stage = np.array(stage)
 
         if self._stage.ndim != 1:
             raise ValueError("stage must be one-dimensional")
@@ -68,55 +67,40 @@ class TableSect(Sect):
         if not np.alltrue(np.diff(stage) >= 0):
             raise ValueError("stage must be sorted in ascending order")
 
-        if self._area.ndim != 1:
-            raise ValueError("area must be one-dimensional")
+        for k, v in kwargs.items():
+            v_array = np.array(v)
 
-        if self._area.size < 2:
-            raise ValueError("area must at least have two elements")
+            if v_array.ndim != 1:
+                raise ValueError("{} must be one-dimensional".format(k))
 
-        if self._top_width.ndim != 1:
-            raise ValueError("top_width must be one-dimensional")
+            if v_array.size < 2:
+                raise ValueError("{} must have at least two elements")
 
-        if self._top_width.size < 2:
-            raise ValueError("top_width must at least have two elements")
+            self.logger.debug("Adding {}".format('_' + k))
 
-        n_stage = self._stage.size
+            setattr(self, '_' + k, v_array)
+            self._methods.append(k)
 
-        if n_stage != self._area.size or n_stage != self._top_width.size:
-            raise ValueError(
-                "stage, area, and top_width must have the same size")
+    def __getattribute__(self, name):
 
-    def area(self, stage, *args):
-        """Returns cross section area
+        methods = super().__getattribute__('_methods')
 
-        Parameters
-        ----------
-        stage : array_like
-            Stage
+        if name in methods:
 
-        Returns
-        -------
-        numpy.ndarray
+            return lambda stage: self._interp(name, stage)
 
-        """
+        else:
 
-        return np.interp(stage, self._stage, self._area)
+            return super().__getattribute__(name)
 
-    def top_width(self, stage, *args):
-        """Returns cross section top width
+    def _interp(self, name, stage):
 
-        Parameters
-        ----------
-        stage : array_like
-            Stage
+        attr = getattr(self, '_' + name)
 
-        Returns
-        -------
-        numpy.ndarray
+        self.logger.debug(
+            "Interpolating {} at stage {}".format('_' + name, stage))
 
-        """
-
-        return np.interp(stage, self._stage, self._top_width)
+        return np.interp(stage, self._stage, attr)
 
 
 class CrossSect(Sect):
@@ -144,7 +128,7 @@ class CrossSect(Sect):
         top_width = xs.top_width(e)
         roughness = xs.roughness(e)
 
-        self._sect = TableSect(e, area, top_width)
+        self._sect = TableSect(stage=e, area=area, top_width=top_width)
         self._frict = TableFrict(e, roughness)
 
         self.logger = logger.getChild(self.__class__.__name__)
