@@ -15,12 +15,11 @@ import numpy as np
 from scipy.optimize import newton
 
 import dynrat
+from dynrat import GRAVITY
 
 
 # module-level logger
 logger = dynrat.logger.getChild(__name__)
-
-GRAVITY = 32.2
 
 
 class QSolve:

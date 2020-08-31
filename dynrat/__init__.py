@@ -1,6 +1,8 @@
 import logging
 
 
+GRAVITY = 32.2
+
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
