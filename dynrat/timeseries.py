@@ -147,6 +147,19 @@ class TimeSeries:
 
         return self.__class__(self._data[subset_tf])
 
+    def to_csv(self, csv_path):
+        """Writes the data contained in this time series to
+        a CSV file
+
+        Parameters
+        ----------
+        csv_path : str
+            Path to CSV file
+
+        """
+
+        self._data.to_csv(csv_path, index_label='DateTime')
+
     def values(self):
         """Returns an array of observed values in this time
         series
