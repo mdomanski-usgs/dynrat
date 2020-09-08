@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 
 from dynrat.timeseries import ContinuousTimeSeries, TimeSeries
 
@@ -72,5 +73,7 @@ def stage_discharge_plot(stage, discharge, ax=None, color=None, label=None):
     ax.set_ylabel('Stage, in ft')
 
     ax.legend()
+
+    ax.set_yscale('log')
 
     return ax
