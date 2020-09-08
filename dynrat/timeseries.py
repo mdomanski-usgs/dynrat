@@ -594,10 +594,10 @@ def read_nwis_csv(csv_path, freq=None, interp_missing=False):
 
     header = lines[0].strip().split(',')
 
-    dt_column = header.index('"dateTime"')
-    tz_column = header.index('"tz_cd"')
-    q_column = header.index('"X_00060_00000"')
-    h_column = header.index('"X_00065_00000"')
+    dt_column = header.index('dateTime')
+    tz_column = header.index('tz_cd')
+    q_column = header.index('X_00060_00000')
+    h_column = header.index('X_00065_00000')
 
     dt_data = []
     h_data = []
@@ -606,6 +606,8 @@ def read_nwis_csv(csv_path, freq=None, interp_missing=False):
     for line in lines[1:]:
 
         line_data = line.strip().split(',')
+
+        line_data = [col.replace('"', '') for col in line_data]
 
         datetime = pd.to_datetime(line_data[dt_column])
         tz = line_data[tz_column].strip('"')
