@@ -41,7 +41,17 @@ class QTimeSeries:
 
         q = np.nan * np.empty_like(h)
 
-        q[0] = self._solver.q_solve(h[0], h0, q0)
+        try:
+            q[0] = self._solver.q_solve(h[0], h0, q0)
+        except RuntimeError:
+            q[0] = np.nan
+            self.logger.error("NaN encountered at index " +
+                              "{}, timestamp {}".format(1,
+                                                        stage_series.index[1]))
+
+            q_series = pd.Series(index=stage_series.index[1:], data=q)
+
+            return ComputedDischargeTimeSeries(q_series)
 
         for i in range(1, len(h)):
 
@@ -50,11 +60,11 @@ class QTimeSeries:
             except RuntimeError:
                 q[i] = np.nan
 
-            dt_step = stage_series.index[i]
+            dt_step = stage_series.index[i+1]
 
             if np.isnan(q[i]):
                 self.logger.error("NaN encountered at index " +
-                                  "{}, timestamp {}".format(i, dt_step))
+                                  "{}, timestamp {}".format(i+1, dt_step))
                 break
             else:
                 self.logger.debug(
