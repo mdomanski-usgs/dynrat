@@ -101,6 +101,29 @@ class TableSect(Sect):
 
         return np.interp(stage, self._stage, attr)
 
+    def to_csv(self, csv_path):
+        """Write this table to a CSV file
+
+        Parameters
+        ----------
+        csv_path : str
+            Path to write CSV file to
+
+        """
+
+        data = [self._stage]
+        columns = ['stage']
+
+        for name in self._methods:
+            columns.append(name)
+            data.append(getattr(self, '_' + name))
+
+        X = np.stack(data, axis=1)
+
+        header = ','.join(columns)
+
+        np.savetxt(csv_path, X, delimiter=',', header=header)
+
 
 class CrossSect(Sect):
     """Cross section
@@ -114,14 +137,20 @@ class CrossSect(Sect):
 
     def __init__(self, xs):
 
+        self.logger = logger.getChild(self.__class__.__name__)
+        self.logger.debug("Initializing {}".format(self.__class__.__name__))
+
         self._xs = xs
 
         self._station, self._elevation = xs.coordinates()
 
+        dh = 0.1
+
         self._e_min = self._elevation.min()
         self._e_max = self._elevation.max()
+        num = int(np.ceil((self._e_max - self._e_min)/dh))
 
-        e = np.linspace(self._e_min, self._e_max)
+        e = np.linspace(self._e_min, self._e_max, num)
 
         kwargs = {'stage': e,
                   'area': xs.area(e),
@@ -130,9 +159,6 @@ class CrossSect(Sect):
                   'vel_dist_factor': xs.vel_dist_factor(e)}
 
         self._sect = TableSect(**kwargs)
-
-        self.logger = logger.getChild(self.__class__.__name__)
-        self.logger.debug("Initializing {}".format(self.__class__.__name__))
 
     def area(self, stage):
         """Computes area of this cross section
@@ -202,6 +228,19 @@ class CrossSect(Sect):
         ax.set_ylabel('Stage, in feet')
 
         return ax
+
+    def table_to_csv(self, csv_path):
+        """Write the hydraulic property table contained
+        in this instance to a CSV file
+
+        Parameters
+        ----------
+        csv_path : str
+            Path to save CSV file
+
+        """
+
+        self._sect.to_csv(csv_path)
 
     def top_width(self, stage):
         """Computes the top width for this cross section at a given stage
