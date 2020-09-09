@@ -1,3 +1,4 @@
+import numpy as np
 from scipy.optimize import newton
 
 import dynrat
@@ -18,18 +19,18 @@ class QSolver:
 
         self.logger = logger.getChild(self.__class__.__name__)
 
-    def _celerity(self, h, top_width):
+    def _celerity(self, h, h_prime, q, q_prime):
 
-        dh = 0.01
-        dk = self._sect.conveyance(h + dh/2) - self._sect.conveyance(h - dh/2)
-        celerity = self._bed_slope**(1/2)/top_width*(dk/dh)
+        area = self._sect.area(h)
+
+        celerity = 1.5*q/area
 
         return celerity
 
     def q_solve(self, h, h_prime, q_prime, q0=None):
 
         # convergence tolerance
-        tol = 1.0  # cfs
+        tol = 1  # cfs
 
         if q0 is None:
             q0 = q_prime
@@ -51,28 +52,44 @@ class QSolver:
 
         area = self._sect.area(h)
         area_prime = self._sect.area(h_prime)
+        da = area - area_prime
 
         beta = self._sect.vel_dist_factor(h)
 
         top_width = self._sect.top_width(h)
 
-        celerity = self._celerity(h, top_width)
-
         dh = h - h_prime
-        y_partial = -1/celerity*dh/self._time_step - \
+        dq = q - q_prime
+
+        celerity = self._celerity(h, h_prime, q, q_prime)
+
+        dt = self._time_step
+
+        y_partial = -1/celerity*dh/dt - \
             2/3*self._bed_slope/self._slope_ratio**2
 
-        term_1 = 1/(GRAVITY*area)*(q - q_prime)/self._time_step
-        term_2 = beta*(2*q)/(GRAVITY*area**2) * \
-            (area - area_prime)/self._time_step
-        term_3 = (1 - beta*top_width*q**2/(GRAVITY*area**3))*y_partial
+        term_1 = 1/(GRAVITY*area)*dq/dt
+        term_2 = beta*(2*q)/(GRAVITY*area**2) * da/dt
+        term_3 = (1 - beta*top_width*q **
+                  2/(GRAVITY*area**3))*y_partial
 
         k = self._sect.conveyance(h)
-        # k_prime = self._sect.conveyance(h_prime)
-
-        # q = k*s_f*(1/2)
-        # q_prime = k_prime*s_f_prime(1/2)
-
         s_f = (q/k)**2
 
-        return term_1 - term_2 + term_3 + s_f - self._bed_slope
+        f = term_1 - term_2 + term_3 + s_f - self._bed_slope
+
+        if not np.isfinite(f):
+            self.logger.error("f computed a non-finite value")
+            if not np.isfinite(term_1):
+                self.logger.debug("term_1 is not finite")
+            if not np.isfinite(term_2):
+                self.logger.debug("term_2 is not finite")
+            if not np.isfinite(term_3):
+                self.logger.debug("term_3 is not finite")
+            if not np.isfinite(y_partial):
+                self.logger.debug("y_partial is not finite")
+            if not np.isfinite(s_f):
+                self.logger.debug("s_f is not finite")
+            raise RuntimeError("Non-finite value computed")
+
+        return f
