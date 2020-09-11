@@ -4,6 +4,7 @@ dynrat package
 .. toctree::
    :maxdepth: 4
 
+   dynpound
    dynrat
    frict
    plot

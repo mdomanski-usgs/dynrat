@@ -1,3 +1,13 @@
+"""
+References
+----------
+.. [1] Fread, D.L., 1973, A dynamic model of stage-discharge
+   relations affected by changing discharge: NOAA Technical
+   Memorandum NWS HYDRO-16, 55 p.
+   http://repository.library.noaa.gov/view/noaa/13480
+
+"""
+
 import numpy as np
 from scipy.optimize import newton
 
@@ -9,23 +19,141 @@ logger = dynrat.logger.getChild(__name__)
 
 
 class QSolver:
+    """DYNPOUND solver
 
-    def __init__(self, sect, bed_slope, slope_ratio, time_step):
+    Parameters
+    ----------
+    sect : CrossSect
+    bed_slope : float
+    slope_ratio : float
+    time_step : float
+    c_comp : {'dkda', 'const k', 'k', 'dqda'}, optional
+        Kinematic wave celerity computation method. The default is 'dkda'.
+
+    Notes
+    -----
+    **Celerity computation methods.**
+
+    *dkda*
+
+    Use the derivative of conveyance with respect to area.
+
+    .. math:: c = S_0^{1/2}\\frac{\\text{d}K}{\\text{d}A}
+
+    where :math:`K` is conveyance.
+
+    *const k*
+
+    Use a constant :math:`K` value in the computation
+    of celerity from [1]_ where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and :math:`K=1.7`.
+
+    *k*
+
+    Compute :math:`K` at each time step, where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and
+
+    .. math::
+        K = \\frac{5}{3} - \\frac{2A}{3B^2}\\frac{\\text{d}B}{\\text{d}A}.
+
+    *dqda*
+
+    Use the derivative of discharge with respect to area.
+
+    .. math:: c = \\frac{\\text{d}Q}{\\text{d}A}
+
+    """
+
+    def __init__(self, sect, bed_slope, slope_ratio, time_step, c_comp='dkda'):
 
         self._bed_slope = bed_slope
         self._sect = sect
         self._slope_ratio = slope_ratio
         self._time_step = time_step
 
+        if c_comp not in ['const k', 'k', 'dqda', 'dkda']:
+            raise ValueError(
+                "Unrecognized celerity computation method: {}".format(c_comp))
+
+        self._c_comp = c_comp
+
         self.logger = logger.getChild(self.__class__.__name__)
 
     def _celerity(self, h, h_prime, q, q_prime):
 
-        area = self._sect.area(h)
+        if self._c_comp == 'const k':
 
-        celerity = 1.5*q/area
+            area = self._sect.area(h)
+
+            k = 1.7
+
+            celerity = k * q/area
+
+        elif self._c_comp == 'k':
+
+            area = self._sect.area(h)
+
+            k = self._K(h, h_prime)
+
+            celerity = k * q/area
+
+        elif self._c_comp == 'dqda':
+
+            min_abs_dq = 1e-9
+            dq = q - q_prime
+            if dq == 0:
+                dq = min_abs_dq
+            elif np.abs(dq) < 0:
+                dq = np.sign(dq)*min_abs_dq
+
+            area = self._sect.area(h)
+            area_prime = self._sect.area(h_prime)
+            da = area - area_prime
+            min_abs_da = 1e-9
+            if da == 0:
+                da = min_abs_da
+            elif np.abs(da) < 0:
+                da = np.sign(da)*min_abs_da
+
+            celerity = dq/da
+
+        elif self._c_comp == 'dkda':
+
+            h_bar = 0.5*(h + h_prime)
+            dh = 0.01
+
+            da = self._sect.area(h_bar + dh/2) - \
+                self._sect.area(h_bar - dh/2)
+
+            dk = self._sect.conveyance(h_bar + dh/2) - \
+                self._sect.conveyance(h_bar - dh/2)
+
+            celerity = self._bed_slope**(1/2)*dk/da
 
         return celerity
+
+    def _K(self, h, h_prime):
+
+        top_width_prime = self._sect.top_width(h_prime)
+        top_width = self._sect.top_width(h)
+        area = self._sect.area(h)
+
+        dh = h - h_prime
+
+        # minimum dh value for computing the derivative of
+        # top with with respect to stage
+        if dh == 0:
+            dBdh = 0
+        else:
+            dBdh = (top_width - top_width_prime) / dh
+
+        return 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
 
     def q_solve(self, h, h_prime, q_prime, q0=None):
 
@@ -41,6 +169,7 @@ class QSolver:
         if not r.converged:
             self.logger.error("dynpound solver failed to converge after "
                               + "{} iterations".format(r.iterations))
+            raise RuntimeError("dynpound zero function failed to converge")
         else:
             self.logger.debug("Converged to value " +
                               "{} after {} iterations".format(root,
