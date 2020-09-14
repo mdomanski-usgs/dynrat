@@ -1,3 +1,5 @@
+import copy
+
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
@@ -175,6 +177,16 @@ class TimeSeries:
 
 class ObservedDischargeTimeSeries(TimeSeries):
 
+    def __init__(self, data, meas_no=None):
+
+        self._meas_no = meas_no
+
+        super().__init__(data)
+
+    def meas_number(self):
+
+        return copy.copy(self._meas_no)
+
     def plot(self, ax=None):
 
         ax = self._time_series_axes(ax)
@@ -186,6 +198,19 @@ class ObservedDischargeTimeSeries(TimeSeries):
         ax.legend()
 
         return ax
+
+    def subset_dt(self, start=None, end=None):
+
+        subset = super().subset_dt(start, end)
+
+        subset_dt = self._data.index.isin(subset._data.index)
+
+        self_meas_no = np.asarray(self._meas_no)
+        subset_meas_no = self_meas_no[subset_dt]
+
+        subset._meas_no = list(subset_meas_no)
+
+        return subset
 
 
 class ObservedStageTimeSeries(TimeSeries):
@@ -526,11 +551,13 @@ def read_nwis_rdb(rdb_path):
     header = lines[i].strip().split('\t')
 
     dt_column = header.index('measurement_dt')  # date and time
+    meas_num_column = header.index('measurement_nu')  # measurement number
     tz_column = header.index('tz_cd')  # time zone
     h_column = header.index('gage_height_va')  # stage
     q_column = header.index('discharge_va')  # discharge
 
     dt_data = []
+    meas_num_data = []
     h_data = []
     q_data = []
 
@@ -557,15 +584,18 @@ def read_nwis_rdb(rdb_path):
         datetime = datetime.tz_localize(time_zones[tz])
         datetime = datetime.tz_convert('UTC')
 
+        meas_num = line_data[meas_num_column]
+
         h_data.append(stage)
         q_data.append(discharge)
         dt_data.append(datetime)
+        meas_num_data.append(meas_num)
 
     index = pd.DatetimeIndex(dt_data)
 
     stage_series = ObservedStageTimeSeries(pd.Series(index=index, data=h_data))
     discharge_series = ObservedDischargeTimeSeries(
-        pd.Series(index=index, data=q_data))
+        pd.Series(index=index, data=q_data), meas_no=meas_num_data)
 
     return stage_series, discharge_series
 
