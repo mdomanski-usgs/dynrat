@@ -74,6 +74,4 @@ def stage_discharge_plot(stage, discharge, ax=None, color=None, label=None):
 
     ax.legend()
 
-    ax.set_yscale('log')
-
     return ax
