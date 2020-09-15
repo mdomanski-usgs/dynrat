@@ -50,7 +50,7 @@ class QSolve:
 
         self.logger = logger.getChild(self.__class__.__name__)
 
-    def _dh(self, h, h_prime):
+    def _dhs(self, h, h_prime):
         return (h - h_prime) / self._time_step
 
     def _f(self, q, l2, l3, l4, l5, l6):
@@ -71,6 +71,10 @@ class QSolve:
             self.logger.error(
                 "f computed a non-finite value")
             raise RuntimeError("Non-finite value computed")
+
+        if np.iscomplex(f):
+            self.logger.error("f computed a complex value")
+            raise RuntimeError("Complex value computed")
 
         return f
 
@@ -94,13 +98,13 @@ class QSolve:
                 "f_prime computed a non-finite value")
             raise RuntimeError("Non-finite value computed")
 
+        if np.iscomplex(f_prime):
+            self.logger.error("f_prime computed a complex value")
+            raise RuntimeError("Complex value computed")
+
         return f_prime
 
     def _K(self, h, h_prime):
-
-        top_width_prime = self._sect.top_width(h_prime)
-        top_width = self._sect.top_width(h)
-        area = self._sect.area(h)
 
         dh = h - h_prime
 
@@ -108,10 +112,18 @@ class QSolve:
         # top with with respect to stage
         if dh == 0:
             dBdh = 0
+            k = 5/3
         else:
+            top_width_prime = self._sect.top_width(h_prime)
+            top_width = self._sect.top_width(h)
+            area = self._sect.area(h)
             dBdh = (top_width - top_width_prime) / dh
+            k = 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
 
-        return 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
+        if k < 0:
+            self.logger.warning("K = {} < 0".format(k))
+
+        return k
 
     @staticmethod
     def _L0(q, l3, l4, l5, l6):
@@ -145,17 +157,17 @@ class QSolve:
 
         area = self._sect.area(h)
         k = self._K(h, h_prime)
-        dh = self._dh(h, h_prime)
-        return area * dh / k
+        dhs = self._dhs(h, h_prime)
+        return area * dhs / k
 
     def _L5(self, h, h_prime):
 
         k = self._K(h, h_prime)
         top_width = self._sect.top_width(h)
         area = self._sect.area(h)
-        dh = self._dh(h, h_prime)
+        dhs = self._dhs(h, h_prime)
 
-        return (1 - 1 / k) * top_width * dh / (GRAVITY * area**2) \
+        return (1 - 1 / k) * top_width * dhs / (GRAVITY * area**2) \
             - 1 / (GRAVITY * area * self._time_step)
 
     def _L6(self, h):
@@ -206,6 +218,7 @@ class QSolve:
         if not r.converged:
             self.logger.error("dynmod solver failed to converge after "
                               + "{} iterations".format(r.iterations))
+            raise RuntimeError("dynmod zero function failed to converge")
         else:
             self.logger.debug("Converged to value " +
                               "{} after {} iterations".format(root,
