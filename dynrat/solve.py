@@ -66,6 +66,10 @@ class QTimeSeries:
                 self.logger.error("NaN encountered at index " +
                                   "{}, timestamp {}".format(i+1, dt_step))
                 break
+            if np.iscomplex(q[i]):
+                self.logger.error("Complex value encountered at index " +
+                                  "{}, timestamp {}".format(i+1, dt_step))
+                break
             else:
                 self.logger.debug(
                     "Computed {} for timestamp {}".format(q[i], dt_step))
