@@ -28,6 +28,10 @@ class Sect:
 
         pass
 
+    @abstractmethod
+    def wetted_perimeter(self, *args):
+        """Returns """
+
 
 class TableSect(Sect):
     """Cross section properties from a table of computed
@@ -156,7 +160,8 @@ class CrossSect(Sect):
                   'area': xs.area(e),
                   'conveyance': xs.conveyance(e),
                   'top_width': xs.top_width(e),
-                  'vel_dist_factor': xs.vel_dist_factor(e)}
+                  'vel_dist_factor': xs.vel_dist_factor(e),
+                  'wetted_perimeter': xs.wetted_perimeter(e)}
 
         self._sect = TableSect(**kwargs)
 
@@ -279,3 +284,17 @@ class CrossSect(Sect):
             return self._xs.vel_dist_factor(stage)
 
         return self._sect.vel_dist_factor(stage)
+
+    def wetted_perimeter(self, stage):
+
+        if not np.isfinite(stage):
+            self.logger.warning(
+                "Non-finite stage passed to wetted_perimeter method")
+
+        if stage < self._e_min or self._e_max < stage:
+            self.logger.warning(
+                "Stage {} is outside of ".format(stage) +
+                "the range of this cross section")
+            return self._xs.wetted_perimeter(stage)
+
+        return self._sect.wetted_perimeter(stage)

@@ -111,14 +111,14 @@ class QSolve:
         # minimum dh value for computing the derivative of
         # top with with respect to stage
         if dh == 0:
-            dBdh = 0
             k = 5/3
         else:
-            top_width_prime = self._sect.top_width(h_prime)
             top_width = self._sect.top_width(h)
+            wetted_perimeter = self._sect.wetted_perimeter(h)
+            wetted_perimeter_prime = self._sect.wetted_perimeter(h_prime)
             area = self._sect.area(h)
-            dBdh = (top_width - top_width_prime) / dh
-            k = 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
+            dPdh = (wetted_perimeter - wetted_perimeter_prime)/dh
+            k = 5 / 3 - 2 / 3 * (area / (top_width * wetted_perimeter)) * dPdh
 
         if k < 0:
             self.logger.warning("K = {} < 0".format(k))
@@ -158,7 +158,10 @@ class QSolve:
         area = self._sect.area(h)
         k = self._K(h, h_prime)
         dhs = self._dhs(h, h_prime)
-        return area * dhs / k
+
+        l4 = area * dhs / k
+
+        return l4
 
     def _L5(self, h, h_prime):
 
@@ -167,8 +170,10 @@ class QSolve:
         area = self._sect.area(h)
         dhs = self._dhs(h, h_prime)
 
-        return (1 - 1 / k) * top_width * dhs / (GRAVITY * area**2) \
+        l5 = (1 - 1 / k) * top_width * dhs / (GRAVITY * area**2) \
             - 1 / (GRAVITY * area * self._time_step)
+
+        return l5
 
     def _L6(self, h):
 
