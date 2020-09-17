@@ -22,7 +22,7 @@ from dynrat import GRAVITY
 logger = dynrat.logger.getChild(__name__)
 
 
-class QSolve:
+class QSolver:
     """Iterative solver for discharge using stage time series.
 
     Parameters
@@ -108,8 +108,6 @@ class QSolve:
 
         dh = h - h_prime
 
-        # minimum dh value for computing the derivative of
-        # top with with respect to stage
         if dh == 0:
             k = 5/3
         else:
