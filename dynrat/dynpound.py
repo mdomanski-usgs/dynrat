@@ -139,20 +139,22 @@ class QSolver:
 
     def _K(self, h, h_prime):
 
-        top_width_prime = self._sect.top_width(h_prime)
-        top_width = self._sect.top_width(h)
-        area = self._sect.area(h)
-
         dh = h - h_prime
 
-        # minimum dh value for computing the derivative of
-        # top with with respect to stage
         if dh == 0:
-            dBdh = 0
+            k = 5/3
         else:
-            dBdh = (top_width - top_width_prime) / dh
+            top_width = self._sect.top_width(h)
+            wetted_perimeter = self._sect.wetted_perimeter(h)
+            wetted_perimeter_prime = self._sect.wetted_perimeter(h_prime)
+            area = self._sect.area(h)
+            dPdh = (wetted_perimeter - wetted_perimeter_prime)/dh
+            k = 5 / 3 - 2 / 3 * (area / (top_width * wetted_perimeter)) * dPdh
 
-        return 5 / 3 - 2 / 3 * (area / top_width**2) * dBdh
+        if k < 0:
+            self.logger.warning("K = {} < 0".format(k))
+
+        return k
 
     def q_solve(self, h, h_prime, q_prime, q0=None):
 
