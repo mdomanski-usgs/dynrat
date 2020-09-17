@@ -125,14 +125,13 @@ class QSolver:
 
         elif self._c_comp == 'dkda':
 
-            h_bar = 0.5*(h + h_prime)
             dh = 0.01
 
-            da = self._sect.area(h_bar + dh/2) - \
-                self._sect.area(h_bar - dh/2)
+            da = self._sect.area(h + dh/2) - \
+                self._sect.area(h - dh/2)
 
-            dk = self._sect.conveyance(h_bar + dh/2) - \
-                self._sect.conveyance(h_bar - dh/2)
+            dk = self._sect.conveyance(h + dh/2) - \
+                self._sect.conveyance(h - dh/2)
 
             celerity = self._bed_slope**(1/2)*dk/da
 
