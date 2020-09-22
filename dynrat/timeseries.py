@@ -362,7 +362,7 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
         ----------
         xs : Sect
             Cross section for computing property
-        prop : {'top width', 'area'}
+        prop : {'top width', 'area', 'wetted perimeter'}
             Cross section property to plot
         ax : matplotlib.axes.Axes, optional
             Axes to plot on
@@ -379,6 +379,9 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
         elif prop == 'area':
             xs_method = xs.area
             label = 'Area'
+        elif prop == 'wetted perimeter':
+            xs_method = xs.wetted_perimeter
+            label = 'Wetted perimeter'
         else:
             raise ValueError("Unrecognized property: {}".format(prop))
 
