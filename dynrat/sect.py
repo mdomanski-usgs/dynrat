@@ -211,7 +211,7 @@ class CrossSect(Sect):
             csv_path, delimiter=',', skiprows=1, unpack=True)
 
         # roughness isn't used here
-        xs = AnchovyXS(station, elevation, 0.035)
+        xs = AnchovyXS(station, elevation, 0.035, wall=True)
 
         return cls(xs)
 
