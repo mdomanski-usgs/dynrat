@@ -35,7 +35,7 @@ class TimeSeries:
         if ax is None:
             ax = plt.axes()
 
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y'))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y %H:%M'))
         plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
 
         return ax
