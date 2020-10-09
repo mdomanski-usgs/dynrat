@@ -386,11 +386,17 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
             raise ValueError("Unrecognized property: {}".format(prop))
 
         xs_values = np.empty_like(self._data.values)
-        for i, v in enumerate(self._data.values):
-            try:
-                xs_values[i] = xs_method(v)
-            except ValueError:
-                xs_values[i] = np.nan
+
+        try:
+            xs_values = xs_method(self._data.values)
+        except ValueError as e:
+
+            # handle case when xs_method can't handle an array argument
+            if 'Use a.any() or a.all()' in e.args[0]:
+                for i, v in enumerate(self._data.values):
+                    xs_values[i] = xs_method(v)
+            else:
+                raise e
 
         ax = self._time_series_axes(ax)
 
