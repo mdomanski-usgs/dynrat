@@ -523,6 +523,71 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
         return rmse
 
 
+def parse_nwis_csv(csv_path):
+    """Parse a CSV file containing continuous NWIS data.
+
+    Parses a CSV obtained using the dataRetrieval R package and
+    returns a Pandas DataFrame
+
+    Parameters
+    ----------
+    csv_path : str
+        Path to CSV file
+
+    Returns
+    -------
+    pandas.DataFrame
+        NWIS stage and discharge time series
+
+    """
+
+    with open(csv_path) as f:
+        lines = f.readlines()
+
+    header = lines[0].strip().split(',')
+
+    dt_column = header.index('dateTime')
+    tz_column = header.index('tz_cd')
+    q_column = header.index('X_00060_00000')
+    h_column = header.index('X_00065_00000')
+
+    dt_data = []
+    h_data = []
+    q_data = []
+
+    for line in lines[1:]:
+
+        line_data = line.strip().split(',')
+
+        line_data = [col.replace('"', '') for col in line_data]
+
+        datetime = pd.to_datetime(line_data[dt_column])
+        tz = line_data[tz_column].strip('"')
+        datetime = datetime.tz_localize(tz)
+        datetime = datetime.tz_convert('UTC')
+        dt_data.append(datetime)
+
+        try:
+            stage = float(line_data[h_column])
+        except ValueError:
+            stage = np.nan
+        h_data.append(stage)
+
+        try:
+            discharge = float(line_data[q_column])
+        except ValueError:
+            discharge = np.nan
+        q_data.append(discharge)
+
+    index = pd.DatetimeIndex(dt_data)
+    index.name = 'DateTime'
+
+    data = np.stack([h_data, q_data], axis=1)
+    columns = ['Stage', 'Discharge']
+
+    return pd.DataFrame(data=data, index=index, columns=columns)
+
+
 def read_nwis_rdb(rdb_path):
     """Reads an NWIS RDB file containing field measurement
     data
@@ -609,64 +674,30 @@ def read_nwis_rdb(rdb_path):
     return stage_series, discharge_series
 
 
-def read_nwis_csv(csv_path, freq=None, interp_missing=False):
-    """Reads a CSV file containing continuous NWIS data
+def read_nwis_hdf(hdf_path, freq=None, interp_missing=False):
+    """Reads an HDF file containing continuous NWIS data
 
-    This function reads CSV files obtained using the
-    dataRetrieval R package.
+    Reads an HDF file saved from a Pandas DataFrame created with
+    :py:func:`parse_nwis_csv`.
 
     Parameters
     ----------
-    csv_path : str
-        Path to NWIS CSV file
+    hdf_path : str
+        Path to HDF file
     freq : float, optional
     interp_missing : boolean, optional
 
     Returns
     -------
     MeasuredStageTimeSeries, RatedDischargeTimeSeries
+        Stage, discharge time series
 
     """
 
-    with open(csv_path) as f:
-        lines = f.readlines()
-
-    header = lines[0].strip().split(',')
-
-    dt_column = header.index('dateTime')
-    tz_column = header.index('tz_cd')
-    q_column = header.index('X_00060_00000')
-    h_column = header.index('X_00065_00000')
-
-    dt_data = []
-    h_data = []
-    q_data = []
-
-    for line in lines[1:]:
-
-        line_data = line.strip().split(',')
-
-        line_data = [col.replace('"', '') for col in line_data]
-
-        datetime = pd.to_datetime(line_data[dt_column])
-        tz = line_data[tz_column].strip('"')
-        datetime = datetime.tz_localize(tz)
-        datetime = datetime.tz_convert('UTC')
-        dt_data.append(datetime)
-
-        try:
-            stage = float(line_data[h_column])
-        except ValueError:
-            stage = np.nan
-        h_data.append(stage)
-
-        try:
-            discharge = float(line_data[q_column])
-        except ValueError:
-            discharge = np.nan
-        q_data.append(discharge)
-
-    index = pd.DatetimeIndex(dt_data)
+    nwis_df = pd.read_hdf(hdf_path, 'nwis')
+    index = nwis_df.index
+    h_data = nwis_df['Stage'].values
+    q_data = nwis_df['Discharge'].values
 
     if freq is None:
         index_diff = index[1] - index[0]
