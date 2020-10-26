@@ -544,7 +544,7 @@ def parse_nwis_csv(csv_path):
     with open(csv_path) as f:
         lines = f.readlines()
 
-    header = lines[0].strip().split(',')
+    header = lines[0].strip().replace('"', '').split(',')
 
     dt_column = header.index('dateTime')
     tz_column = header.index('tz_cd')
