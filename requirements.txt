@@ -8,3 +8,4 @@ rope
 rstcheck
 scipy==1.4.1
 Sphinx
+tables==3.6.1
