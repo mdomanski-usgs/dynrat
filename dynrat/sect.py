@@ -136,10 +136,11 @@ class CrossSect(Sect):
     ----------
     xs : anchovy.crosssection.CrossSection
         Instance of a cross section from the anchovy package
+    max_elev : None, float, optional
 
     """
 
-    def __init__(self, xs):
+    def __init__(self, xs, max_elev=None):
 
         self.logger = logger.getChild(self.__class__.__name__)
         self.logger.debug("Initializing {}".format(self.__class__.__name__))
@@ -152,6 +153,10 @@ class CrossSect(Sect):
 
         self._e_min = self._elevation.min()
         self._e_max = self._elevation.max()
+
+        if max_elev is not None and max_elev > self._e_max:
+            self._e_max = max_elev
+
         num = int(np.ceil((self._e_max - self._e_min)/dh))
 
         e = np.linspace(self._e_min, self._e_max, num)
