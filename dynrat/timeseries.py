@@ -548,8 +548,18 @@ def parse_nwis_csv(csv_path):
 
     dt_column = header.index('dateTime')
     tz_column = header.index('tz_cd')
-    q_column = header.index('X_00060_00000')
-    h_column = header.index('X_00065_00000')
+
+    try:
+        q_column = header.index('X_00060_00000')
+        read_q = True
+    except ValueError:
+        read_q = False
+
+    try:
+        h_column = header.index('X_00065_00000')
+        read_h = True
+    except ValueError:
+        read_h = False
 
     dt_data = []
     h_data = []
@@ -567,15 +577,21 @@ def parse_nwis_csv(csv_path):
         datetime = datetime.tz_convert('UTC')
         dt_data.append(datetime)
 
-        try:
-            stage = float(line_data[h_column])
-        except ValueError:
+        if read_h:
+            try:
+                stage = float(line_data[h_column])
+            except ValueError:
+                stage = np.nan
+        else:
             stage = np.nan
         h_data.append(stage)
 
-        try:
-            discharge = float(line_data[q_column])
-        except ValueError:
+        if read_q:
+            try:
+                discharge = float(line_data[q_column])
+            except ValueError:
+                discharge = np.nan
+        else:
             discharge = np.nan
         q_data.append(discharge)
 
