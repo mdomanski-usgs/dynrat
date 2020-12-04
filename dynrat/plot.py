@@ -6,12 +6,31 @@ import numpy as np
 from dynrat.timeseries import ContinuousTimeSeries, TimeSeries
 
 
-def multicolor_h_vs_q(stage, discharge, axs=None, colormap='binary'):
+def _plot_obs_data(obs_data, t_min, t_max, ax1, ax2, cmap, norm):
 
-    if axs is None:
+    obs_flow_data = obs_data[1].data()
+    obs_time = obs_flow_data.index.values.astype(float)
+    norm_obs_time = (obs_time - t_min) / (t_max - t_min)
+
+    h_values = obs_data[0].data().values
+    q_values = obs_flow_data.values
+
+    ax1.scatter(norm_obs_time, q_values,
+                c=norm_obs_time, cmap=cmap, norm=norm)
+    ax2.scatter(q_values, h_values,
+                c=norm_obs_time, cmap=cmap, norm=norm)
+
+    return obs_flow_data.min(), obs_flow_data.max()
+
+
+def multicolor_h_vs_q(stage, discharge, obs_data=None, fig=None,
+                      colormap='binary'):
+
+    if fig is None:
         fig = plt.figure()
-        ax1 = plt.subplot2grid((4, 1), (0, 0), colspan=1, rowspan=1, fig=fig)
-        ax2 = plt.subplot2grid((4, 1), (1, 0), colspan=1, rowspan=3, fig=fig)
+
+    ax1 = plt.subplot2grid((4, 1), (0, 0), colspan=1, rowspan=1, fig=fig)
+    ax2 = plt.subplot2grid((4, 1), (1, 0), colspan=1, rowspan=3, fig=fig)
 
     h_series = stage.data()
     q_series = discharge.data()
@@ -21,7 +40,10 @@ def multicolor_h_vs_q(stage, discharge, axs=None, colormap='binary'):
     q_values = q_series[inter_idx].values
     h_values = h_series[inter_idx].values
     time_as_float = inter_idx.values.astype(float)
-    time_range = time_as_float.max() - time_as_float.min()
+    t_min = time_as_float.min()
+    t_max = time_as_float.max()
+    time_range = t_max - t_min
+
     norm_time_as_float = (time_as_float - time_as_float.min()) / time_range
     norm = plt.Normalize(norm_time_as_float.min(), norm_time_as_float.max())
 
@@ -41,26 +63,39 @@ def multicolor_h_vs_q(stage, discharge, axs=None, colormap='binary'):
     h_q_lc.set_linewidth(2)
     ax2.add_collection(h_q_lc)
 
+    if obs_data is not None:
+        q_obs_min, q_obs_max = _plot_obs_data(
+            obs_data, t_min, t_max, ax1, ax2, colormap, norm)
+    else:
+        q_obs_min = np.inf
+        q_obs_max = -np.inf
+
+    q_max = np.max([q_values.max(), q_obs_max])
+    q_min = np.min([q_values.min(), q_obs_min])
+
     h_range = h_values.max() - h_values.min()
-    q_range = q_values.max() - q_values.min()
+    q_range = q_max - q_min
 
     margin = 0.1
 
-    q_lim = (q_values.min() - margin*q_range,
-             q_values.max() + margin*q_range)
+    q_lim = (q_min - margin*q_range, q_max + margin*q_range)
 
     h_lim = (h_values.min() - margin*h_range,
              h_values.max() + margin*h_range)
 
-    ax1.set_ylabel('Discharge, in cfs')
-    ax1.tick_params(axis='x', which='both', bottom=False,
-                    top=False, labelbottom=False)
+    ax1.set_xlabel('Time')
+    ax1.set_ylabel('Discharge')
+    ax1.tick_params(which='both', bottom=False, left=False,
+                    labelleft=False, labelbottom=False)
+    ax1.set_xlim((0, 1))
     ax1.set_ylim(q_lim)
 
     ax2.set_xlabel('Discharge, in cfs')
     ax2.set_xlim(q_lim)
     ax2.set_ylabel('Stage, in ft')
     ax2.set_ylim(h_lim)
+
+    fig.tight_layout()
 
     return fig
 
