@@ -6,25 +6,41 @@ import numpy as np
 from dynrat.timeseries import ContinuousTimeSeries, TimeSeries
 
 
-def _plot_obs_data(obs_data, t_min, t_max, ax1, ax2, cmap, norm):
+def _color_scale(time_as_float, t_min, t_max, periods):
+
+    time_range = t_max - t_min
+    period_range = time_range / periods
+    scaled_times = (time_as_float - t_min) / period_range
+
+    while np.any(scaled_times > 1):
+        gt_one = scaled_times > 1
+        scaled_times[gt_one] -= 1
+
+    return scaled_times
+
+
+def _plot_obs_data(obs_data, t_min, t_max, ax1, ax2, cmap, norm, periods):
 
     obs_flow_data = obs_data[1].data()
     obs_time = obs_flow_data.index.values.astype(float)
-    norm_obs_time = (obs_time - t_min) / (t_max - t_min)
+    time_range = t_max - t_min
+    norm_obs_time = (obs_time - t_min) / time_range
+
+    color_scale = _color_scale(obs_time, t_min, t_max, periods)
 
     h_values = obs_data[0].data().values
     q_values = obs_flow_data.values
 
     ax1.scatter(norm_obs_time, q_values,
-                c=norm_obs_time, cmap=cmap, norm=norm)
+                c=color_scale, cmap=cmap, norm=norm)
     ax2.scatter(q_values, h_values,
-                c=norm_obs_time, cmap=cmap, norm=norm)
+                c=color_scale, cmap=cmap, norm=norm)
 
     return obs_flow_data.min(), obs_flow_data.max()
 
 
 def multicolor_h_vs_q(stage, discharge, obs_data=None, fig=None,
-                      colormap='binary'):
+                      colormap='twilight', periods=1):
 
     if fig is None:
         fig = plt.figure()
@@ -44,14 +60,16 @@ def multicolor_h_vs_q(stage, discharge, obs_data=None, fig=None,
     t_max = time_as_float.max()
     time_range = t_max - t_min
 
+    scaled_times = _color_scale(time_as_float, t_min, t_max, periods)
+
     norm_time_as_float = (time_as_float - time_as_float.min()) / time_range
-    norm = plt.Normalize(norm_time_as_float.min(), norm_time_as_float.max())
+    norm = plt.Normalize(0, 1)
 
     # discharge vs time hydrograph
     q_t_points = np.array([norm_time_as_float, q_values]).T.reshape(-1, 1, 2)
     q_t_segments = np.concatenate([q_t_points[:-1], q_t_points[1:]], axis=1)
     q_t_lc = LineCollection(q_t_segments, cmap=colormap, norm=norm)
-    q_t_lc.set_array(norm_time_as_float)
+    q_t_lc.set_array(scaled_times)
     q_t_lc.set_linewidth(2)
     ax1.add_collection(q_t_lc)
 
@@ -59,13 +77,13 @@ def multicolor_h_vs_q(stage, discharge, obs_data=None, fig=None,
     h_q_points = np.array([q_values, h_values]).T.reshape(-1, 1, 2)
     h_q_segments = np.concatenate([h_q_points[:-1], h_q_points[1:]], axis=1)
     h_q_lc = LineCollection(h_q_segments, cmap=colormap, norm=norm)
-    h_q_lc.set_array(norm_time_as_float)
+    h_q_lc.set_array(scaled_times)
     h_q_lc.set_linewidth(2)
     ax2.add_collection(h_q_lc)
 
     if obs_data is not None:
         q_obs_min, q_obs_max = _plot_obs_data(
-            obs_data, t_min, t_max, ax1, ax2, colormap, norm)
+            obs_data, t_min, t_max, ax1, ax2, colormap, norm, periods)
     else:
         q_obs_min = np.inf
         q_obs_max = -np.inf
@@ -87,7 +105,7 @@ def multicolor_h_vs_q(stage, discharge, obs_data=None, fig=None,
     ax1.set_ylabel('Discharge')
     ax1.tick_params(which='both', bottom=False, left=False,
                     labelleft=False, labelbottom=False)
-    ax1.set_xlim((0, 1))
+    ax1.set_xlim((norm_time_as_float.min(), norm_time_as_float.max()))
     ax1.set_ylim(q_lim)
 
     ax2.set_xlabel('Discharge, in cfs')
