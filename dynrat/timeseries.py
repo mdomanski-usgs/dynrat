@@ -425,6 +425,21 @@ class MeasuredStageTimeSeries(ContinuousTimeSeries):
 class ComputedDischargeTimeSeries(ContinuousTimeSeries):
 
     def mean_error(self, rated_discharge, relative=False):
+        """Returns the mean error of the intersection of time
+        series observations in `rated_discharge`
+
+        Parameters
+        ----------
+        rated_discharge : RatedDischargeTimeSeries
+        relative : bool, optional
+            Compute relative error, in %
+
+        Returns
+        -------
+        float
+            Mean error
+
+        """
 
         q_rated = rated_discharge.data()
 
