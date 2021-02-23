@@ -641,8 +641,8 @@ def read_nwis_rdb(rdb_path):
                   'CDT': 'CST6CDT',
                   'MST': 'MST7MDT',
                   'MDT': 'MST7MDT',
-                  'PST': 'PST7PDT',
-                  'PDT': 'PST7PDT',
+                  'PST': 'PST8PDT',
+                  'PDT': 'PST8PDT',
                   '': 'UTC'}
 
     with open(rdb_path) as f:
