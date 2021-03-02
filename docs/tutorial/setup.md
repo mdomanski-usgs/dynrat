@@ -56,9 +56,9 @@ Welcome to GitLab, @mdomanski!
 If the command fails,
 see [Setting up GitLab SSH](ssh.md).
 
-### Clone the anchovy and dynrat repositories
-anchovy contains functionality to compute cross section geometry and is a
-dependency of dynrat. At this time, the best way to obtain anchovy is to clone
+### Clone the hydxscomp and dynrat repositories
+hydxscomp contains functionality to compute cross section geometry and is a
+dependency of dynrat. At this time, the best way to obtain hydxscomp is to clone
 the repository.
 
 In Git Bash, navigate to the directory where you want to store the
@@ -70,10 +70,10 @@ clone the dynrat repository, type the following command.
 $ git clone git@code.usgs.gov:dynamic-rating/dynrat.git
 ```
 
-The following command clones the anchovy repository.
+The following command clones the hydxscomp repository.
 
 ```
-$ git clone git@code.usgs.gov:mdomanski/aluminiumanchovy.git
+$ git clone git@code.usgs.gov:dynamic-rating/hydxscomp.git
 ```
 
 ### Change directories
@@ -123,23 +123,23 @@ environment in the future. If you work with VSCode, the IDE will activate the
 environment in the terminal after the Python extension is loaded and a new
 terminal is opened.
 
-### Install anchovy
+### Install hydxscomp
 In order for the Python interpreter in the dynrat environment to have "global"
-access to the anchovy package, you'll have to install the package within the
+access to the hydxscomp package, you'll have to install the package within the
 dynrat environment.
 
 This command assumes you're working in the dynrat directory and have cloned the
-anchovy repository in the parent directory.
+hydxscomp repository in the parent directory.
 
 ```
-(env) $ pip install -e ../aluminumanchovy
+(env) $ pip install -e ../hydxscomp
 ```
 
 pip is the standard Python package management system. The `-e` option tells pip
-to install the anchovy package in "editable" mode (see
+to install the hydxscomp package in "editable" mode (see
 [Editable installs](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs)
-for more info). `../aluminumanchovy` tells pip to look for a setup.py file in
-the directory named aluminumanchovy which is one level above the current
+for more info). `../hydxscomp` tells pip to look for a setup.py file in
+the directory named hydxscomp which is one level above the current
 working directory.
 
 ### Install the required packages
@@ -177,7 +177,7 @@ See more at
 [Installing the IPython kernel](https://ipython.readthedocs.io/en/stable/install/kernel_install.html#kernels-for-different-environments)
 
 ### Install the dynrat package
-Similar to the anchovy package, you will install the dynrat package in the
+Similar to the hydxscomp package, you will install the dynrat package in the
 dynrat environment using the editable option.
 
 This command assumes your current working directory is the directory that
