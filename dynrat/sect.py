@@ -3,7 +3,7 @@ from abc import abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
 
-from anchovy.crosssection import CrossSection as AnchovyXS
+from hydxscomp.crosssection import CrossSection as AnchovyXS
 
 import dynrat
 from dynrat.frict import TableFrict
@@ -134,8 +134,8 @@ class CrossSect(Sect):
 
     Parameters
     ----------
-    xs : anchovy.crosssection.CrossSection
-        Instance of a cross section from the anchovy package
+    xs : hydxscomp.crosssection.CrossSection
+        Instance of a cross section from the hydxscomp package
     max_elev : None, float, optional
 
     """

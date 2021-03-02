@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from anchovy.crosssection import CrossSection
+from hydxscomp.crosssection import CrossSection
 
 import dynrat
 from dynrat.rslope import r_slope
