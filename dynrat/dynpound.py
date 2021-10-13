@@ -18,57 +18,7 @@ from dynrat import GRAVITY
 logger = dynrat.logger.getChild(__name__)
 
 
-class QSolver:
-    """DYNPOUND solver
-
-    Parameters
-    ----------
-    sect : CrossSect
-    bed_slope : float
-    slope_ratio : float
-    time_step : float
-    c_comp : {'dkda', 'const k', 'k', 'dqda'}, optional
-        Kinematic wave celerity computation method. The default is 'dkda'.
-
-    Notes
-    -----
-    **Celerity computation methods.**
-
-    *dkda*
-
-    Use the derivative of conveyance with respect to area.
-
-    .. math:: c = S_0^{1/2}\\frac{\\text{d}K}{\\text{d}A}
-
-    where :math:`K` is conveyance.
-
-    *const k*
-
-    Use a constant :math:`K` value in the computation
-    of celerity from [1]_ where
-
-    .. math:: c = K\\frac{Q}{A}
-
-    and :math:`K=1.7`.
-
-    *k*
-
-    Compute :math:`K` at each time step, where
-
-    .. math:: c = K\\frac{Q}{A}
-
-    and
-
-    .. math::
-        K = \\frac{5}{3} - \\frac{2A}{3B^2}\\frac{\\text{d}B}{\\text{d}A}.
-
-    *dqda*
-
-    Use the derivative of discharge with respect to area.
-
-    .. math:: c = \\frac{\\text{d}Q}{\\text{d}A}
-
-    """
+class Solver:
 
     def __init__(self, sect, bed_slope, slope_ratio, time_step, c_comp='dkda'):
 
@@ -156,28 +106,6 @@ class QSolver:
 
         return k
 
-    def q_solve(self, h, h_prime, q_prime, q0=None):
-
-        # convergence tolerance
-        tol = 1  # cfs
-
-        if q0 is None:
-            q0 = q_prime
-
-        root, r = newton(lambda q: self.zero_func(
-            h, h_prime, q, q_prime), q0, tol=tol, full_output=True, disp=False)
-
-        if not r.converged:
-            self.logger.error("dynpound solver failed to converge after "
-                              + "{} iterations".format(r.iterations))
-            raise RuntimeError("dynpound zero function failed to converge")
-        else:
-            self.logger.debug("Converged to value " +
-                              "{} after {} iterations".format(root,
-                                                              r.iterations))
-
-        return root
-
     def zero_func(self, h, h_prime, q, q_prime):
 
         area = self._sect.area(h)
@@ -223,3 +151,153 @@ class QSolver:
             raise RuntimeError("Non-finite value computed")
 
         return f
+
+
+class HSolver(Solver):
+    """DYNPOUND stage solver
+
+    Parameters
+    ----------
+    sect : CrossSect
+    bed_slope : float
+    slope_ratio : float
+    time_step : float
+    c_comp : {'dkda', 'const k', 'k', 'dqda'}, optional
+        Kinematic wave celerity computation method. The default is 'dkda'.
+
+    Notes
+    -----
+    **Celerity computation methods.**
+
+    *dkda*
+
+    Use the derivative of conveyance with respect to area.
+
+    .. math:: c = S_0^{1/2}\\frac{\\text{d}K}{\\text{d}A}
+
+    where :math:`K` is conveyance.
+
+    *const k*
+
+    Use a constant :math:`K` value in the computation
+    of celerity from [1]_ where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and :math:`K=1.7`.
+
+    *k*
+
+    Compute :math:`K` at each time step, where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and
+
+    .. math::
+        K = \\frac{5}{3} - \\frac{2A}{3B^2}\\frac{\\text{d}B}{\\text{d}A}.
+
+    *dqda*
+
+    Use the derivative of discharge with respect to area.
+
+    .. math:: c = \\frac{\\text{d}Q}{\\text{d}A}
+
+    """
+
+    def h_solve(self, q, q_prime, h_prime, h0=None):
+
+        # convergence tolerance
+        tol = 0.1
+
+        if h0 is None:
+            h0 = h_prime
+
+        root, r = newton(lambda h: self.zero_func(
+            h, h_prime, q, q_prime), h0, tol=tol, full_output=True, disp=False)
+
+        if not r.converged:
+            self.logger.error("dynpound solver failed to converge after "
+                              + "{} iterations".format(r.iterations))
+            raise RuntimeError("dynpound zero function failed to converge")
+        else:
+            self.logger.debug("Converged to value " +
+                              "{} after {} iterations".format(root,
+                                                              r.iterations))
+
+        return root
+
+
+class QSolver(Solver):
+    """DYNPOUND discharge solver
+
+    Parameters
+    ----------
+    sect : CrossSect
+    bed_slope : float
+    slope_ratio : float
+    time_step : float
+    c_comp : {'dkda', 'const k', 'k', 'dqda'}, optional
+        Kinematic wave celerity computation method. The default is 'dkda'.
+
+    Notes
+    -----
+    **Celerity computation methods.**
+
+    *dkda*
+
+    Use the derivative of conveyance with respect to area.
+
+    .. math:: c = S_0^{1/2}\\frac{\\text{d}K}{\\text{d}A}
+
+    where :math:`K` is conveyance.
+
+    *const k*
+
+    Use a constant :math:`K` value in the computation
+    of celerity from [1]_ where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and :math:`K=1.7`.
+
+    *k*
+
+    Compute :math:`K` at each time step, where
+
+    .. math:: c = K\\frac{Q}{A}
+
+    and
+
+    .. math::
+        K = \\frac{5}{3} - \\frac{2A}{3B^2}\\frac{\\text{d}B}{\\text{d}A}.
+
+    *dqda*
+
+    Use the derivative of discharge with respect to area.
+
+    .. math:: c = \\frac{\\text{d}Q}{\\text{d}A}
+
+    """
+
+    def q_solve(self, h, h_prime, q_prime, q0=None):
+
+        # convergence tolerance
+        tol = 1  # cfs
+
+        if q0 is None:
+            q0 = q_prime
+
+        root, r = newton(lambda q: self.zero_func(
+            h, h_prime, q, q_prime), q0, tol=tol, full_output=True, disp=False)
+
+        if not r.converged:
+            self.logger.error("dynpound solver failed to converge after "
+                              + "{} iterations".format(r.iterations))
+            raise RuntimeError("dynpound zero function failed to converge")
+        else:
+            self.logger.debug("Converged to value " +
+                              "{} after {} iterations".format(root,
+                                                              r.iterations))
+
+        return root
