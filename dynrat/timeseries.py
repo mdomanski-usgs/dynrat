@@ -538,6 +538,76 @@ class ComputedDischargeTimeSeries(ContinuousTimeSeries):
         return rmse
 
 
+class ComputedStageTimeSeries(ContinuousTimeSeries):
+
+    def plot(self, ax=None):
+
+        ax = self._time_series_axes(ax)
+
+        datetime = mdates.date2num(self._data.index.to_pydatetime())
+
+        ax.plot(datetime, self._data.values, label='DYNRAT Computed Stage',
+                linestyle='solid', color='dodgerblue')
+        ax.set_ylabel('Stage, in ft')
+
+        ax.legend()
+
+        return ax
+
+    def plot_relative_error(self, measured_stage, ax=None):
+        """Plots relative error time series
+
+        Parameters
+        ----------
+        measured_stage : MeasuredStageTimeSeries
+        ax : matplotlib.axes.Axes
+
+        Returns
+        -------
+        matplotlib.axes.Axes
+
+        """
+
+        ax = self._time_series_axes(ax)
+
+        relative_error = self.relative_error(measured_stage)
+
+        datetime = mdates.date2num(relative_error.index)
+
+        ax.plot(datetime, relative_error.values, label='Relative Error',
+                linestyle='solid', color='darkorchid')
+        ax.set_ylabel('Relative Error, in %')
+
+        ax.legend()
+
+        return ax
+
+    def relative_error(self, measured_stage):
+        """Computes relative error
+
+        Parameters
+        ----------
+        measured_stage : MeasuredStageTimeSeries
+
+        Returns
+        -------
+        pandas.Series
+
+        """
+
+        h_measured = measured_stage.data()
+
+        intersect_idx = self._data.index.intersection(h_measured.index)
+
+        h_meas = h_measured[intersect_idx]
+        h_comp = self._data[intersect_idx]
+
+        relative_error = 100*(h_comp - h_meas)/h_meas
+
+        return pd.Series(index=intersect_idx, data=relative_error)
+
+
+
 def parse_nwis_csv(csv_path):
     """Parse a CSV file containing continuous NWIS data.
 
