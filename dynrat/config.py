@@ -8,7 +8,7 @@ class Config:
     def __init__(self, path):
 
         if not os.path.exists(path):
-            raise File
+            raise FileNotFoundError
         self._config_path = path
 
         self._load_config()
