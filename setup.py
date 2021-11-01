@@ -11,7 +11,8 @@ version = '0.0'
 release = '0.0.1'
 dev_status = 'Development Status :: 1 - Planning'
 
-install_requires = ['numpy', 'scipy']
+install_requires = ['numpy==1.18.1',
+                    'pandas==1.0.1', 'scipy==1.4.1', 'tables==3.6.1']
 
 setup_kwargs = {
     'name': name,
