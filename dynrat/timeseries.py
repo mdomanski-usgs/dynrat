@@ -344,7 +344,7 @@ class RatedDischargeTimeSeries(ContinuousTimeSeries):
         datetime = mdates.date2num(self._data.index.to_pydatetime())
 
         ax.plot(datetime, self._data.values,
-                label='WSC Computed Discharge', linestyle='solid',
+                label='USGS Computed Discharge', linestyle='solid',
                 color='darkslategray')
         ax.set_ylabel('Discharge, in cfs')
 
