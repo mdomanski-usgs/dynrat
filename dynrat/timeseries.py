@@ -268,7 +268,9 @@ class ContinuousTimeSeries(TimeSeries):
             tz=data.index.tz)
         index.name = 'DateTime'
 
-        new_data = data[index]
+        new_data = pd.Series(index=index, dtype=np.float64)
+        index_intersection = index.intersection(data.index)
+        new_data[index_intersection] = data[index_intersection]
 
         if interp_missing:
             new_data = new_data.interpolate()
@@ -605,7 +607,6 @@ class ComputedStageTimeSeries(ContinuousTimeSeries):
         relative_error = 100*(h_comp - h_meas)/h_meas
 
         return pd.Series(index=intersect_idx, data=relative_error)
-
 
 
 def parse_nwis_csv(csv_path):

@@ -1,11 +1,12 @@
 autopep8
 notebook
-numpy==1.18.1
-pandas==1.0.1
+numpy==1.22.1
+pandas==1.4.0
 pylint
 recommonmark
 rope
 rstcheck
-scipy==1.4.1
+scipy==1.7.3
 Sphinx
-tables==3.6.1
+tables==3.7.0
+PyYAML==6.0

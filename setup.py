@@ -11,8 +11,11 @@ version = '0.0'
 release = '0.0.1'
 dev_status = 'Development Status :: 1 - Planning'
 
-install_requires = ['numpy==1.18.1',
-                    'pandas==1.0.1', 'scipy==1.4.1', 'tables==3.6.1']
+install_requires = ['numpy==1.22.1',
+                    'pandas==1.4.0',
+                    'scipy==1.7.3',
+                    'tables==3.7.0',
+                    'PyYAML==6.0']
 
 setup_kwargs = {
     'name': name,
@@ -29,7 +32,7 @@ setup_kwargs = {
         'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering :: Hydrology'
     ],
-    'python_requires': '~=3.7',
+    'python_requires': '~=3.10',
     'install_requires': install_requires
 }
 
