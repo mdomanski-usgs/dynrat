@@ -1,3 +1,7 @@
+__release__ = '1.0.0.dev1'
+__version__ = '1.0'
+
+
 import logging
 
 

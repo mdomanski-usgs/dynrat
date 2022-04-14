@@ -7,9 +7,14 @@ except BaseException:
     sphinx_imported = False
 
 name = 'dynrat'
-version = '0.0'
-release = '0.0.1'
-dev_status = 'Development Status :: 1 - Planning'
+
+about = {}
+with open('dynrat/__init__.py') as fp:
+    exec(fp.read(), about)
+release = about['__release__']
+version = about['__version__']
+
+dev_status = 'Development Status :: 3 - Alpha'
 
 install_requires = ['numpy==1.22.1',
                     'pandas==1.4.0',

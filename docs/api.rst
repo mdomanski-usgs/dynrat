@@ -1,5 +1,5 @@
-dynrat package
-==============
+API
+===
 
 .. toctree::
    :maxdepth: 4

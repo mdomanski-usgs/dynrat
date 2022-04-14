@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to dynrat's documentation!
+dynrat documentation
 ==================================
 
 .. toctree::
@@ -11,10 +11,7 @@ Welcome to dynrat's documentation!
    :caption: Contents:
 
    CONTRIBUTING
-   tutorial/index
-   method
-   newmethod
-   modules
+   api
 
 
 Indices and tables
